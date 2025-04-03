@@ -1,4 +1,5 @@
 import 'package:family_bottom_sheet/src/presentation/home_screen.dart';
+import 'package:family_bottom_sheet/src/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -20,8 +21,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Family Tray Animation',
+      themeMode: ThemeMode.dark,
+      theme: AppTheme.lightTheme,
+      highContrastTheme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      highContrastDarkTheme: AppTheme.darkTheme,
+      debugShowCheckedModeBanner: false,
       home: HomeScreen(),
     );
   }
