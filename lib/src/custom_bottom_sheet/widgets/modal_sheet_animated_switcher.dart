@@ -5,10 +5,12 @@ class FamilyModalSheetAnimatedSwitcher extends StatefulWidget {
     super.key,
     required this.pageIndex,
     required this.pages,
+    required this.contentBackgroundColor,
   }) : assert(pageIndex >= 0 && pageIndex < pages.length);
 
   final int pageIndex;
   final List<Widget> pages;
+  final Color contentBackgroundColor;
 
   @override
   State<FamilyModalSheetAnimatedSwitcher> createState() =>
@@ -20,6 +22,7 @@ class _FamilyModalSheetAnimatedSwitcherState
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _heightAnimation;
+  // late Animation<double> _testing1;
 
   Widget? _currentWidget;
   Widget? _previousWidget;
@@ -35,6 +38,7 @@ class _FamilyModalSheetAnimatedSwitcherState
 
     _animationController = AnimationController(
       vsync: this,
+      //TODO: Pass the animation duration from the route
       duration: const Duration(milliseconds: 200),
     );
 
@@ -44,6 +48,13 @@ class _FamilyModalSheetAnimatedSwitcherState
         curve: Curves.easeInOutQuad,
       ),
     );
+
+    // _testing1 = Tween<double>(begin: 0, end: 1).animate(
+    //   CurvedAnimation(
+    //     parent: _animationController,
+    //     curve: Interval(0, 0.8, curve: Curves.easeInOutQuad),
+    //   ),
+    // );
 
     if (widget.pages.isNotEmpty && widget.pageIndex < widget.pages.length) {
       _currentWidget = widget.pages[widget.pageIndex];
@@ -67,7 +78,7 @@ class _FamilyModalSheetAnimatedSwitcherState
         borderRadius: BorderRadius.circular(36),
         child: Container(
           decoration: ShapeDecoration(
-            color: Colors.white,
+            color: widget.contentBackgroundColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(36),
             ),
@@ -75,7 +86,7 @@ class _FamilyModalSheetAnimatedSwitcherState
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // -- Offstage current widget
+              // -- Current
               Offstage(
                 child: SizedBox(key: _measureKey, child: _currentWidget),
               ),

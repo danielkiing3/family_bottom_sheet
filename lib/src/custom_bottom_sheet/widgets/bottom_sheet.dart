@@ -14,6 +14,7 @@ class FamilyBottomSheet extends StatefulWidget {
     super.key,
     required this.pageIndex,
     required this.pages,
+    required this.contentBackgroundColor,
     this.animationController,
     this.enableDrag = true,
     this.showDragHandle,
@@ -28,14 +29,13 @@ class FamilyBottomSheet extends StatefulWidget {
     this.clipBehavior,
     this.constraints,
     required this.onClosing,
-    // required this.builder,
   }) : assert(elevation == null || elevation >= 0.0);
 
   final AnimationController? animationController;
 
   final VoidCallback onClosing;
 
-  // final WidgetBuilder builder;
+  final Color contentBackgroundColor;
 
   final bool enableDrag;
 
@@ -234,13 +234,14 @@ class _FamilyBottomSheetState extends State<FamilyBottomSheet> {
     }
 
     final pageContent = FamilyModalSheetAnimatedSwitcher(
+      contentBackgroundColor: widget.contentBackgroundColor,
       pageIndex: widget.pageIndex,
       pages: widget.pages,
     );
 
     Widget bottomSheet = Material(
       key: _childKey,
-      color: Colors.transparent,
+      color: color,
       elevation: elevation,
       surfaceTintColor: surfaceTintColor,
       shadowColor: shadowColor,
@@ -286,6 +287,8 @@ class _FamilyBottomSheetState extends State<FamilyBottomSheet> {
 }
 
 /// Copied from the Flutter framework
+///
+///
 class _DragHandle extends StatelessWidget {
   const _DragHandle({
     required this.onSemanticsTap,
