@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 const Curve _modalBottomSheetCurve = Easing.legacyDecelerate;
-const double _defaultScrollControlDisabledMaxHeightRatio = 9.0 / 16.0;
+const double _defaultScrollControlDisabledMaxHeightRatio = 1;
 
 class FamilyModalSheet<T> extends StatefulWidget {
   const FamilyModalSheet({
@@ -22,6 +22,7 @@ class FamilyModalSheet<T> extends StatefulWidget {
         _defaultScrollControlDisabledMaxHeightRatio,
     this.enableDrag = true,
     this.showDragHandle = false,
+    this.safeAreaMinimum,
   });
 
   final FamilyBottomSheetRoute<T> route;
@@ -36,6 +37,7 @@ class FamilyModalSheet<T> extends StatefulWidget {
   final BoxConstraints? constraints;
   final bool enableDrag;
   final bool showDragHandle;
+  final EdgeInsets? safeAreaMinimum;
 
   static FamilyModalSheetState of(BuildContext context) {
     FamilyModalSheetState? familyModalSheetState;
@@ -59,9 +61,25 @@ class FamilyModalSheet<T> extends StatefulWidget {
   static Future<T?> show<T>({
     required BuildContext context,
     required WidgetBuilder builder,
-    bool useRootNavigator = false,
+    required Color contentBackgroundColor,
+    Color? backgroundColor,
+    String? barrierLabel,
+    double? elevation,
+    ShapeBorder? shape,
+    Clip? clipBehavior,
+    Color? barrierColor,
+    BoxConstraints? constraints,
     bool isScrollControlled = false,
+    bool useRootNavigator = false,
     bool isDismissible = true,
+    bool enableDrag = true,
+    bool? showDragHandle,
+    bool useSafeArea = false,
+    RouteSettings? routeSettings,
+    AnimationController? transitionAnimationController,
+    Offset? anchorPoint,
+    AnimationStyle? sheetAnimationStyle,
+    EdgeInsets? safeAreaMinimum,
   }) {
     final NavigatorState navigator = Navigator.of(
       context,
@@ -76,6 +94,32 @@ class FamilyModalSheet<T> extends StatefulWidget {
       FamilyBottomSheetRoute<T>(
         builder: builder,
         isScrollControlled: isScrollControlled,
+        contentBackgroundColor: contentBackgroundColor,
+        capturedThemes: InheritedTheme.capture(
+          from: context,
+          to: navigator.context,
+        ),
+        barrierLabel: barrierLabel ?? localizations.scrimLabel,
+        barrierOnTapHint: localizations.scrimOnTapHint(
+          localizations.bottomSheetLabel,
+        ),
+        backgroundColor: backgroundColor,
+        elevation: elevation,
+        shape: shape,
+        clipBehavior: clipBehavior,
+        constraints: constraints,
+        isDismissible: isDismissible,
+        useSafeArea: useSafeArea,
+        enableDrag: enableDrag,
+        modalBarrierColor:
+            barrierColor ??
+            Theme.of(context).bottomSheetTheme.modalBarrierColor,
+        showDragHandle: showDragHandle,
+        settings: routeSettings,
+        transitionAnimationController: transitionAnimationController,
+        anchorPoint: anchorPoint,
+        sheetAnimationStyle: sheetAnimationStyle,
+        safeAreaMinimum: safeAreaMinimum,
       ),
     );
   }
@@ -86,6 +130,7 @@ class FamilyModalSheet<T> extends StatefulWidget {
 
 class FamilyModalSheetState extends State<FamilyModalSheet> {
   ParametricCurve<double> animationCurve = _modalBottomSheetCurve;
+  final ValueNotifier<int> pageIndexNotifier = ValueNotifier<int>(0);
 
   List<Widget> _pages = [];
 
@@ -95,11 +140,11 @@ class FamilyModalSheetState extends State<FamilyModalSheet> {
 
   int get currentPageIndex => _currentPageIndex;
 
-  int get _currentPageIndex => widget.pageIndexNotifier.value;
+  int get _currentPageIndex => pageIndexNotifier.value;
 
   /// Setter to update the state of [widget.pageIndexNotifier]
   set _currentPageIndex(int value) {
-    widget.pageIndexNotifier.value = value;
+    pageIndexNotifier.value = value;
   }
 
   String _getRouteLabel(MaterialLocalizations localizations) {
@@ -136,7 +181,7 @@ class FamilyModalSheetState extends State<FamilyModalSheet> {
   void initState() {
     super.initState();
 
-    _pages = [widget.builder(context)];
+    _pages = [widget.route.builder(context)];
   }
 
   @override
@@ -177,20 +222,35 @@ class FamilyModalSheetState extends State<FamilyModalSheet> {
         );
       },
       child: ValueListenableBuilder(
-        valueListenable: widget.pageIndexNotifier,
+        valueListenable: pageIndexNotifier,
         builder: (context, currentPageIndex, _) {
-          return FamilyBottomSheet(
-            pageIndex: currentPageIndex,
-            pages: pages,
-            onClosing: () {
-              if (widget.route.isCurrent) {
-                Navigator.pop(context);
-              }
-            },
-            enableDrag: widget.enableDrag,
-            backgroundColor: widget.backgroundColor,
-            onDragStart: handleDragStart,
-            onDragEnd: handleDragEnd,
+          return SafeArea(
+            minimum: widget.safeAreaMinimum ?? EdgeInsets.zero,
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.viewInsetsOf(context).bottom,
+              ),
+              child: FamilyBottomSheet(
+                contentBackgroundColor: widget.route.contentBackgroundColor,
+                pageIndex: currentPageIndex,
+                animationController: widget.route.animationController,
+                pages: pages,
+                onClosing: () {
+                  if (widget.route.isCurrent) {
+                    Navigator.pop(context);
+                  }
+                },
+                backgroundColor: widget.backgroundColor ?? Colors.transparent,
+                elevation: widget.elevation,
+                shape: widget.shape,
+                clipBehavior: widget.clipBehavior,
+                constraints: widget.constraints,
+                enableDrag: widget.enableDrag,
+                showDragHandle: widget.showDragHandle,
+                onDragStart: handleDragStart,
+                onDragEnd: handleDragEnd,
+              ),
+            ),
           );
         },
       ),
