@@ -1,9 +1,7 @@
 import 'package:family_bottom_sheet/src/common/divider/small_divider.dart';
 import 'package:family_bottom_sheet/src/custom_bottom_sheet/widgets/modal_sheet.dart';
-import 'package:family_bottom_sheet/src/presentation/widgets/choose_area_content.dart';
 import 'package:family_bottom_sheet/src/presentation/widgets/help_support_content.dart';
 import 'package:family_bottom_sheet/src/presentation/widgets/options_content.dart';
-import 'package:family_bottom_sheet/src/presentation/widgets/report_bug_content.dart';
 import 'package:family_bottom_sheet/src/presentation/widgets/settings_menu_item.dart';
 import 'package:family_bottom_sheet/src/theme/app_theme.dart';
 import 'package:flutter/material.dart';
