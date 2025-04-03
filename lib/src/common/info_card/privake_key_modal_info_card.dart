@@ -1,3 +1,4 @@
+import 'package:family_bottom_sheet/src/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class PrivakeKeyModalInfoCard extends StatelessWidget {
@@ -12,23 +13,21 @@ class PrivakeKeyModalInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            color: Colors.black.withOpacity(0.6),
-          ),
+          Icon(icon, color: colors.iconDefault),
           const SizedBox(width: 12),
           Text(
             text,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black.withOpacity(0.6),
+            style: context.textStyles.labelLarge.copyWith(
+              color: context.colors.textWeak,
             ),
-          )
+          ),
         ],
       ),
     );
