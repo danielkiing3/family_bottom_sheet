@@ -1,7 +1,8 @@
 import 'package:family_bottom_sheet/src/common/button/back_button.dart';
-import 'package:family_bottom_sheet/src/common/button/custom_elevated_button.dart';
+import 'package:family_bottom_sheet/src/common/button/custom_button.dart';
 import 'package:family_bottom_sheet/src/common/info_card/privake_key_modal_info_card.dart';
 import 'package:family_bottom_sheet/src/custom_bottom_sheet/widgets/modal_sheet.dart';
+import 'package:family_bottom_sheet/src/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 
@@ -10,9 +11,11 @@ class PrivateKeyContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return DecoratedBox(
       decoration: ShapeDecoration(
-        color: Colors.white,
+        color: colors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(36)),
       ),
       child: Padding(
@@ -29,29 +32,35 @@ class PrivateKeyContent extends StatelessWidget {
                   Icon(
                     IconsaxPlusLinear.card_tick,
                     size: 44,
-                    color: Colors.grey.withOpacity(0.9),
+                    color: colors.iconDefault,
                   ),
-                  const CustomBackButton(),
+                  CustomBackButton(),
                 ],
               ),
               const SizedBox(height: 12),
 
               // -- Private Key header
-              const Text(
+              Text(
                 'Private Key',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: context.textStyles.heading.copyWith(
+                  color: colors.textDefault,
+                  fontSize: 22,
+                ),
               ),
               const SizedBox(height: 12),
 
               // -- Text Content
               Text(
                 'Your Private key is the key used to back up your wallet. Keep it secret and secure at all times.',
-                style: TextStyle(
-                  color: Colors.black.withOpacity(0.6),
-                  fontSize: 16,
+                style: context.textStyles.labelLarge.copyWith(
+                  color: context.colors.textWeak,
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
+
+              // -- Divider
+              Divider(),
+              const SizedBox(height: 20),
 
               // -- Info row
               const PrivakeKeyModalInfoCard(
@@ -68,38 +77,27 @@ class PrivateKeyContent extends StatelessWidget {
               ),
 
               // --Buttons
+              SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: CustomElevatedButton(
-                        onTap: () async {
-                          // await HapticFeedback.lightImpact();
-
-                          FamilyModalSheet.of(context).popPage();
-                        },
-                        text: 'Cancel',
-                        isCircular: true,
-                      ),
+                    child: CustomTestButton(
+                      onTap: () {
+                        FamilyModalSheet.of(context).popPage();
+                      },
+                      text: 'Cancel',
+                      isCircular: true,
                     ),
                   ),
+                  SizedBox(width: 12),
                   Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: CustomElevatedButton(
-                        onTap: () {},
-                        text: 'Reveal',
-                        isCircular: true,
-                        contentColor: Colors.white,
-                        backgroundColor: const Color.fromARGB(
-                          255,
-                          104,
-                          173,
-                          248,
-                        ),
-                        icon: IconsaxPlusLinear.eye_slash,
-                      ),
+                    child: CustomTestButton(
+                      text: 'Reveal',
+                      isCircular: true,
+                      shouldCenter: true,
+                      contentColor: Colors.white,
+                      backgroundColor: const Color.fromARGB(255, 79, 174, 248),
+                      icon: IconsaxPlusLinear.eye_slash,
                     ),
                   ),
                 ],
