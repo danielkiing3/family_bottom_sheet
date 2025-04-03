@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 
 class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
   final EdgeInsets? safeAreaMinimum;
+  final Color contentBackgroundColor;
 
   FamilyBottomSheetRoute({
     required super.builder,
     required super.isScrollControlled,
+    required this.contentBackgroundColor,
     super.capturedThemes,
     super.barrierOnTapHint,
     super.backgroundColor = Colors.transparent,
@@ -56,6 +58,23 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
     super.dispose();
   }
 
+  AnimationController? animationController;
+
+  @override
+  AnimationController createAnimationController() {
+    assert(animationController == null);
+    if (transitionAnimationController != null) {
+      animationController = transitionAnimationController;
+      willDisposeAnimationController = false;
+    } else {
+      animationController = BottomSheet.createAnimationController(
+        navigator!,
+        sheetAnimationStyle: sheetAnimationStyle,
+      );
+    }
+    return animationController!;
+  }
+
   @override
   Widget buildPage(
     BuildContext context,
@@ -63,10 +82,6 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
     Animation<double> secondaryAnimation,
   ) {
     final BottomSheetThemeData sheetTheme = Theme.of(context).bottomSheetTheme;
-    final BottomSheetThemeData defaults =
-        Theme.of(context).useMaterial3
-            ? _BottomSheetDefaultsM3(context)
-            : const BottomSheetThemeData();
 
     final Widget content = DisplayFeatureSubScreen(
       anchorPoint: anchorPoint,
@@ -78,13 +93,9 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
         backgroundColor:
             backgroundColor ??
             sheetTheme.modalBackgroundColor ??
-            sheetTheme.backgroundColor ??
-            defaults.backgroundColor,
+            sheetTheme.backgroundColor,
         elevation:
-            elevation ??
-            sheetTheme.modalElevation ??
-            sheetTheme.elevation ??
-            defaults.modalElevation,
+            elevation ?? sheetTheme.modalElevation ?? sheetTheme.elevation,
         shape: shape,
         clipBehavior: clipBehavior,
         constraints: constraints,
@@ -92,6 +103,7 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
         showDragHandle:
             showDragHandle ??
             (enableDrag && (sheetTheme.showDragHandle ?? false)),
+        safeAreaMinimum: safeAreaMinimum,
       ),
     );
 
@@ -111,6 +123,7 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
 /// Copied from the Flutter framework
 ///
 /// Default Material 3 spec for Bottom Sheet
+/// https://m3.material.io/components/bottom-sheets/specs
 class _BottomSheetDefaultsM3 extends BottomSheetThemeData {
   _BottomSheetDefaultsM3(this.context)
     : super(
