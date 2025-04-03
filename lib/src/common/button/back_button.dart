@@ -1,30 +1,26 @@
+import 'package:family_bottom_sheet/src/custom_bottom_sheet/widgets/modal_sheet.dart';
+import 'package:family_bottom_sheet/src/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class CustomBackButton extends StatelessWidget {
-  const CustomBackButton({
-    super.key,
-  });
+  const CustomBackButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.grey.withOpacity(0.2),
-      ),
-      height: 32,
-      // width: 34,
-      child: IconButton(
-        onPressed: () {
-          HapticFeedback.lightImpact();
-          Navigator.of(context).pop();
-        },
-        padding: EdgeInsets.zero,
-        icon: const Icon(
-          Icons.close,
-          size: 22,
+    final colors = context.colors;
+
+    return GestureDetector(
+      onTap: () {
+        FamilyModalSheet.of(context).popPage();
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: colors.surfaceSecondary,
         ),
+        height: 32,
+        width: 32,
+        child: Icon(Icons.close, size: 22, color: colors.iconHighlighted),
       ),
     );
   }
