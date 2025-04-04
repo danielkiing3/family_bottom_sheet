@@ -1,16 +1,37 @@
-# family_bottom_sheet
+# Inspired by the Family Dynamic Tray System
 
-A new Flutter project.
+## Video Demo 
+Device: Google Pixel 3a
 
-## Getting Started
+https://github.com/user-attachments/assets/8bf0ce45-7c29-4c90-8e1f-167e2bb9e08d
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+Btw, Check out written docs about [Family](https://family.co/) design values and philosophy here. Beautiful write-up
+https://benji.org/family-values
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Installation
+To run this app locally, follow these steps:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Clone the repo locally
+
+```bash
+git clone https://github.com/danielkiing3/amily_bottom_sheet.git
+cd amily_bottom_sheet
+```
+2. Install dependencies:
+```bash
+flutter pub get
+```
+3. Run the app:
+```bash
+flutter run
+```
+
+# 💬 Contact
+If you have any questions or feedback, feel free to reach out:
+
+Email: oluwaferanmiidaniel@gmail.com
+
+GitHub: [danielkiing3](https://github.com/danielkiing3)
+
+Twitter: [@daniel_kiing3](https://twitter.com/daniel_kiing3)
