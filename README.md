@@ -6,7 +6,7 @@ Device: Google Pixel 3a
 https://github.com/user-attachments/assets/8bf0ce45-7c29-4c90-8e1f-167e2bb9e08d
 
 
-Btw, Check out written docs about [Family](https://family.co/) design values and philosophy here. Beautiful write-up
+Btw, Check out the written docs about [Family](https://family.co/) design values and philosophy here. Beautiful write-up
 https://benji.org/family-values
 
 ## Installation
