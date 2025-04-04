@@ -1,5 +1,6 @@
 import 'package:family_bottom_sheet/src/presentation/home_screen.dart';
 import 'package:family_bottom_sheet/src/theme/app_theme.dart';
+import 'package:family_bottom_sheet/src/theme/theme_mode_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -21,15 +22,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Family Tray Animation',
-      themeMode: ThemeMode.dark,
-      theme: AppTheme.lightTheme,
-      highContrastTheme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      highContrastDarkTheme: AppTheme.darkTheme,
-      debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+    return ThemeModeNotifierProvider(
+      themeModeNotifier: ThemeModeNotifier(),
+      child: Builder(
+        builder: (context) {
+          return ValueListenableBuilder(
+            valueListenable: ThemeModeNotifierProvider.of(context),
+            builder: (context, themeMode, _) {
+              return MaterialApp(
+                title: 'Family Tray Animation',
+                themeMode: themeMode,
+                theme: AppTheme.lightTheme,
+                highContrastTheme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                highContrastDarkTheme: AppTheme.darkTheme,
+                // debugShowCheckedModeBanner: false,
+                home: HomeScreen(),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

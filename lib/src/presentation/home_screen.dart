@@ -4,6 +4,7 @@ import 'package:family_bottom_sheet/src/presentation/widgets/help_support_conten
 import 'package:family_bottom_sheet/src/presentation/widgets/options_content.dart';
 import 'package:family_bottom_sheet/src/presentation/widgets/settings_menu_item.dart';
 import 'package:family_bottom_sheet/src/theme/app_theme.dart';
+import 'package:family_bottom_sheet/src/theme/theme_mode_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 
@@ -17,8 +18,20 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Scaffold(
-      appBar: AppBar(title: Text('Family Bottom Sheet')),
+      appBar: AppBar(
+        title: Text('Family Bottom Sheet'),
+        actions: [
+          IconButton(
+            icon: Icon(IconsaxPlusLinear.setting_2, color: colors.iconDefault),
+            onPressed: () {
+              ThemeModeNotifierProvider.of(context).toggleMode();
+            },
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.only(left: 24, right: 24, bottom: 48),
         children: [
