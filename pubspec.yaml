@@ -1,18 +1,21 @@
 name: family_bottom_sheet
-description: "A new Flutter project."
+description: A package for building smooth, customizable multi-page bottom sheets with seamless transitions — just like a Navigator, but inside a bottom sheet.
+version: 0.0.1
+repository: https://github.com/danielkiing3/family_bottom_sheet
 
-publish_to: 'none' 
-
-version: 1.0.0+1
+topics:
+  - ui
+  - widget
+  - bottom-sheet
+  - custom-modal
 
 environment:
-  sdk: ^3.7.0
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
-  iconsax_plus: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -21,9 +24,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-  fonts:
-    - family: Nunito
-      fonts:
-        - asset: assets/fonts/Nunito/Nunito-Bold.ttf
-          weight: 700
