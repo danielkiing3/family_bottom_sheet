@@ -1,10 +1,18 @@
-import 'package:family_bottom_sheet/src/custom_bottom_sheet/widgets/modal_sheet.dart';
 import 'package:flutter/material.dart';
 
-class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
-  final EdgeInsets? safeAreaMinimum;
-  final Color contentBackgroundColor;
+import 'family_modal_sheet.dart';
+import 'family_bottom_sheet.dart';
 
+final _defaultAnimationStyle = AnimationStyle(
+  duration: const Duration(milliseconds: 200),
+  reverseDuration: const Duration(milliseconds: 200),
+);
+
+/// A custom modal route for displaying a [FamilyBottomSheet].
+///
+/// This route provides additional configuration for styling and layout
+/// of the bottom sheet's main content area.
+class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
   FamilyBottomSheetRoute({
     required super.builder,
     required super.isScrollControlled,
@@ -28,14 +36,37 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
     super.useSafeArea = true,
     AnimationStyle? sheetAnimationStyle,
     this.safeAreaMinimum = const EdgeInsets.only(bottom: 4),
+    this.mainContentPadding,
+    this.mainContentBorderRadius,
+    this.mainContentAnimationStyle,
   }) : super(
-         sheetAnimationStyle:
-             sheetAnimationStyle ??
-             AnimationStyle(
-               duration: const Duration(milliseconds: 200),
-               reverseDuration: const Duration(milliseconds: 200),
-             ),
-       );
+          sheetAnimationStyle: sheetAnimationStyle ?? _defaultAnimationStyle,
+        );
+
+  /// The background color of the bottom sheet's main content area.
+  final Color contentBackgroundColor;
+
+  /// Optional minimum padding to apply respecting the device's safe area.
+  ///
+  /// This is useful for adding consistent padding at the bottom
+  /// (e.g., above system gestures).
+  final EdgeInsets? safeAreaMinimum;
+
+  /// Optional padding around the main content of the sheet.
+  ///
+  /// This padding is applied outside the content area.
+  final EdgeInsets? mainContentPadding;
+
+  /// Optional border radius for the main content container.
+  ///
+  /// This controls the rounding of the sheet's corners.
+  final BorderRadius? mainContentBorderRadius;
+
+  /// Optional animation style used when switching between pages
+  /// inside the bottom sheet.
+  ///
+  /// Defines how content transitions are animated.
+  final AnimationStyle? mainContentAnimationStyle;
 
   final ValueNotifier<EdgeInsets> _clipInsetssNotifier =
       ValueNotifier<EdgeInsets>(EdgeInsets.zero);
@@ -58,6 +89,8 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
     super.dispose();
   }
 
+  /// The animation controller that controls the modal sheet's entrance and
+  /// exit animations.
   AnimationController? animationController;
 
   @override
@@ -67,7 +100,7 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
       animationController = transitionAnimationController;
       willDisposeAnimationController = false;
     } else {
-      animationController = BottomSheet.createAnimationController(
+      animationController = FamilyBottomSheet.createAnimationController(
         navigator!,
         sheetAnimationStyle: sheetAnimationStyle,
       );
@@ -87,11 +120,9 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
       anchorPoint: anchorPoint,
       child: FamilyModalSheet(
         route: this,
-        pageIndexNotifier: ValueNotifier<int>(0),
         builder: builder,
         isScrollControlled: isScrollControlled,
-        backgroundColor:
-            backgroundColor ??
+        backgroundColor: backgroundColor ??
             sheetTheme.modalBackgroundColor ??
             sheetTheme.backgroundColor,
         elevation:
@@ -100,21 +131,19 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
         clipBehavior: clipBehavior,
         constraints: constraints,
         enableDrag: enableDrag,
-        showDragHandle:
-            showDragHandle ??
+        showDragHandle: showDragHandle ??
             (enableDrag && (sheetTheme.showDragHandle ?? false)),
         safeAreaMinimum: safeAreaMinimum,
       ),
     );
 
-    final Widget bottomSheet =
-        useSafeArea
-            ? SafeArea(bottom: false, child: content)
-            : MediaQuery.removePadding(
-              context: context,
-              removeTop: true,
-              child: content,
-            );
+    final Widget bottomSheet = useSafeArea
+        ? SafeArea(bottom: false, child: content)
+        : MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: content,
+          );
 
     return capturedThemes?.wrap(bottomSheet) ?? bottomSheet;
   }
