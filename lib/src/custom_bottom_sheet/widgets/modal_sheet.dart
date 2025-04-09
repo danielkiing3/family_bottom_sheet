@@ -1,7 +1,8 @@
-import 'package:family_bottom_sheet/src/custom_bottom_sheet/widgets/bottom_sheet.dart';
-import 'package:family_bottom_sheet/src/custom_bottom_sheet/widgets/bottom_sheet_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
+import 'bottom_sheet.dart';
+import 'bottom_sheet_route.dart';
 
 const Curve _modalBottomSheetCurve = Easing.legacyDecelerate;
 const double _defaultScrollControlDisabledMaxHeightRatio = 1;
@@ -9,7 +10,6 @@ const double _defaultScrollControlDisabledMaxHeightRatio = 1;
 class FamilyModalSheet<T> extends StatefulWidget {
   const FamilyModalSheet({
     super.key,
-    required this.pageIndexNotifier,
     required this.builder,
     required this.route,
     this.backgroundColor,
@@ -25,20 +25,73 @@ class FamilyModalSheet<T> extends StatefulWidget {
     this.safeAreaMinimum,
   });
 
+  /// The route that defines the modal sheet’s behavior and configuration.
   final FamilyBottomSheetRoute<T> route;
-  final ValueNotifier<int> pageIndexNotifier;
+
+  /// The widget builder that creates the content of the modal sheet.
   final WidgetBuilder builder;
+
+  /// Whether the height of the sheet should be fully controlled by the content
+  /// or allowed to expand based on constraints.
   final bool isScrollControlled;
+
+  /// Ratio of the max height at which scroll control is disabled, allowing for
+  /// a more free-flowing modal behavior. This defines the point at which the
+  /// sheet's scroll behavior is no longer restricted.
   final double scrollControlDisabledMaxHeightRatio;
+
+  /// The background color of the modal sheet.
   final Color? backgroundColor;
+
+  /// The elevation (shadow depth) of the modal sheet, which affects the visual
+  /// prominence and depth of the sheet.
   final double? elevation;
+
+  /// The shape of the modal sheet’s border, allowing for custom corner radii
+  /// or other shapes.
   final ShapeBorder? shape;
+
+  /// The clipping behavior for the modal sheet’s content. Defines how the content
+  /// should be clipped if it overflows the sheet’s bounds.
   final Clip? clipBehavior;
+
+  /// Constraints to control the size and layout of the modal sheet. This allows
+  /// for fine-grained control over the sheet's maximum and minimum sizes.
   final BoxConstraints? constraints;
+
+  /// Whether the sheet can be dragged by the user to dismiss it.
   final bool enableDrag;
+
+  /// Whether to show a drag handle for the user to interact with when dismissing
+  /// the sheet.
   final bool showDragHandle;
+
+  /// Optional minimum padding to apply when safe areas (e.g., notches) are present,
+  /// ensuring that the sheet content is not obscured by such areas.
   final EdgeInsets? safeAreaMinimum;
 
+  @override
+  State<FamilyModalSheet> createState() => FamilyModalSheetState();
+
+  /// Retrieves the nearest [FamilyModalSheetState] from the widget tree.
+  ///
+  /// This function looks for a [FamilyModalSheetState] either in the current
+  /// [BuildContext] or by traversing the widget tree upwards to find the
+  /// closest ancestor with this state. It ensures that the state of the
+  /// [FamilyModalSheet] is available for further operations.
+  ///
+  /// Use this method when you need to access the state of a modal sheet
+  /// (e.g., to push or pop pages or modify other properties) from a
+  /// descendant widget in the tree.
+  ///
+  /// Throws an error if no ancestor state of type [FamilyModalSheetState] is found.
+  /// Throws a [FlutterError] in debug mode, and an exception in release mode
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final modalSheetState = FamilyModalSheetState.of(context);
+  /// modalSheetState.pushPage(YourPageWidget());
+  /// `
   static FamilyModalSheetState of(BuildContext context) {
     FamilyModalSheetState? familyModalSheetState;
     if (context is StatefulElement && context.state is FamilyModalSheetState) {
@@ -58,10 +111,63 @@ class FamilyModalSheet<T> extends StatefulWidget {
     return familyModalSheetState!;
   }
 
+  /// Shows a customizable modal bottom sheet with support for internal page
+  /// navigation and smooth in-place transitions between content views.
+  ///
+  /// This enables building flows where users can navigate deeper within the
+  /// same bottom sheet — without dismissing or presenting a new sheet —
+  /// inspired by the Family app's bottom sheet design language.
+  ///
+  /// {@template FamilyBottomSheet.ModalSheet}
+  ///
+  /// This function creates and pushes a [FamilyBottomSheetRoute] onto the
+  /// navigator stack, allowing full control over appearance, behavior, and
+  /// animation styles of the bottom sheet.
+  ///
+  /// Parameters:
+  /// - `context`: The build context to retrieve the [Navigator] and theming.
+  /// - `builder`: The widget builder for the bottom sheet's content.
+  /// - `contentBackgroundColor`: The background color for the main content area of the sheet.
+  /// - `mainContentBorderRadius`: Optional border radius for the main content area.
+  /// - `mainContentPadding`: Optional padding for the main content area.
+  /// - `safeAreaMinimum`: Minimum padding to apply when `useSafeArea` is true.
+  /// - `backgroundColor`: The background color behind the sheet (typically the sheet's container).
+  /// - `barrierLabel`: Semantic label for the modal barrier.
+  /// - `elevation`: Elevation of the sheet material.
+  /// - `shape`: Custom shape of the sheet.
+  /// - `clipBehavior`: Clip behavior for the sheet.
+  /// - `constraints`: Constraints for the sheet's size.
+  /// - `isScrollControlled`: Whether the sheet can take up the full height of the screen.
+  /// - `useRootNavigator`: Whether to push the sheet using the root navigator.
+  /// - `isDismissible`: Whether tapping outside dismisses the sheet.
+  /// - `enableDrag`: Whether the sheet can be dismissed by dragging down.
+  /// - `showDragHandle`: Whether to display a drag handle at the top of the sheet.
+  /// - `useSafeArea`: Whether to apply padding for safe areas (notches, etc).
+  /// - `routeSettings`: Optional settings to pass to the route.
+  /// - `transitionAnimationController`: Optional animation controller for the route transition.
+  /// - `anchorPoint`: Optional anchor point for positioning the sheet.
+  /// - `mainContentAnimationStyle`: Custom animation style for the main content appearance.
+  /// - `sheetAnimationStyle`: Custom animation style for the overall sheet appearance.
+  ///
+  /// Returns a [Future] that resolves to the value passed to [Navigator.pop] when the sheet is dismissed.
+  /// {@endtemplate}
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final result = await FamilyBottomSheet.show(
+  ///   context: context,
+  ///   builder: (context) => YourBottomSheetContent(),
+  ///   contentBackgroundColor: Colors.white,
+  /// );
+  /// ```
+  ///
   static Future<T?> show<T>({
     required BuildContext context,
     required WidgetBuilder builder,
     required Color contentBackgroundColor,
+    BorderRadius? mainContentBorderRadius,
+    EdgeInsets? mainContentPadding,
+    EdgeInsets? safeAreaMinimum,
     Color? backgroundColor,
     String? barrierLabel,
     double? elevation,
@@ -74,12 +180,12 @@ class FamilyModalSheet<T> extends StatefulWidget {
     bool isDismissible = true,
     bool enableDrag = true,
     bool? showDragHandle,
-    bool useSafeArea = false,
+    bool useSafeArea = true,
     RouteSettings? routeSettings,
     AnimationController? transitionAnimationController,
     Offset? anchorPoint,
+    AnimationStyle? mainContentAnimationStyle,
     AnimationStyle? sheetAnimationStyle,
-    EdgeInsets? safeAreaMinimum,
   }) {
     final NavigatorState navigator = Navigator.of(
       context,
@@ -111,8 +217,7 @@ class FamilyModalSheet<T> extends StatefulWidget {
         isDismissible: isDismissible,
         useSafeArea: useSafeArea,
         enableDrag: enableDrag,
-        modalBarrierColor:
-            barrierColor ??
+        modalBarrierColor: barrierColor ??
             Theme.of(context).bottomSheetTheme.modalBarrierColor,
         showDragHandle: showDragHandle,
         settings: routeSettings,
@@ -120,33 +225,143 @@ class FamilyModalSheet<T> extends StatefulWidget {
         anchorPoint: anchorPoint,
         sheetAnimationStyle: sheetAnimationStyle,
         safeAreaMinimum: safeAreaMinimum,
+        mainContentPadding: mainContentPadding,
+        mainContentBorderRadius: mainContentBorderRadius,
+        mainContentAnimationStyle: mainContentAnimationStyle,
       ),
     );
   }
 
-  @override
-  State<FamilyModalSheet> createState() => FamilyModalSheetState();
+  /// Shows a customizable modal bottom sheet that follows Flutter's default
+  /// Material Design style but still supports internal navigation and
+  /// customizable behavior.
+  ///
+  ///
+  /// Use this when you want a bottom sheet that closely resembles Flutter's
+  /// Material Design out-of-the-box, with sensible default values for a
+  /// more streamlined implementation. This version comes with default styling
+  /// choices like rounded corners and minimal safe area handling, making it
+  /// quick to use while still offering full flexibility for customization.
+  ///
+  /// Like [show], it supports pushing and popping pages within the bottom sheet
+  /// for internal navigation, giving you the ability to navigate deeper into
+  /// content without dismissing or creating new sheets.
+  ///
+  /// Use this when you want a bottom sheet that feels consistent with
+  /// standard Flutter components — simple, familiar, and platform-aligned.
+  ///
+  /// {@macro FamilyBottomSheet.ModalSheet}
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final result = await FamilyBottomSheet.showMaterialDefault(
+  ///   context: context,
+  ///   builder: (context) => YourBottomSheetContent(),
+  ///   contentBackgroundColor: Colors.black,
+  /// );
+  /// ```
+  ///
+  static Future<T?> showMaterialDefault<T>({
+    required BuildContext context,
+    required WidgetBuilder builder,
+    required Color contentBackgroundColor,
+    BorderRadius mainContentBorderRadius = const BorderRadius.only(
+      topLeft: Radius.circular(36),
+      topRight: Radius.circular(36),
+    ),
+    EdgeInsets mainContentPadding = EdgeInsets.zero,
+    EdgeInsets? safeAreaMinimum,
+    Color? backgroundColor,
+    String? barrierLabel,
+    double? elevation,
+    ShapeBorder? shape,
+    Clip? clipBehavior,
+    Color? barrierColor,
+    BoxConstraints? constraints,
+    bool isScrollControlled = false,
+    bool useRootNavigator = false,
+    bool isDismissible = true,
+    bool enableDrag = true,
+    bool? showDragHandle,
+    bool useSafeArea = false,
+    RouteSettings? routeSettings,
+    AnimationController? transitionAnimationController,
+    Offset? anchorPoint,
+    AnimationStyle? mainContentAnimationStyle,
+    AnimationStyle? sheetAnimationStyle,
+  }) {
+    final NavigatorState navigator = Navigator.of(
+      context,
+      rootNavigator: useRootNavigator,
+    );
+
+    final MaterialLocalizations localizations = MaterialLocalizations.of(
+      context,
+    );
+
+    return navigator.push(
+      FamilyBottomSheetRoute<T>(
+        builder: builder,
+        isScrollControlled: isScrollControlled,
+        contentBackgroundColor: contentBackgroundColor,
+        capturedThemes: InheritedTheme.capture(
+          from: context,
+          to: navigator.context,
+        ),
+        barrierLabel: barrierLabel ?? localizations.scrimLabel,
+        barrierOnTapHint: localizations.scrimOnTapHint(
+          localizations.bottomSheetLabel,
+        ),
+        backgroundColor: backgroundColor,
+        elevation: elevation,
+        shape: shape,
+        clipBehavior: clipBehavior,
+        constraints: constraints,
+        isDismissible: isDismissible,
+        useSafeArea: useSafeArea,
+        enableDrag: enableDrag,
+        modalBarrierColor: barrierColor ??
+            Theme.of(context).bottomSheetTheme.modalBarrierColor,
+        showDragHandle: showDragHandle,
+        settings: routeSettings,
+        transitionAnimationController: transitionAnimationController,
+        anchorPoint: anchorPoint,
+        sheetAnimationStyle: sheetAnimationStyle,
+        safeAreaMinimum: safeAreaMinimum,
+        mainContentPadding: mainContentPadding,
+        mainContentBorderRadius: mainContentBorderRadius,
+        mainContentAnimationStyle: mainContentAnimationStyle,
+      ),
+    );
+  }
 }
 
 class FamilyModalSheetState extends State<FamilyModalSheet> {
-  ParametricCurve<double> animationCurve = _modalBottomSheetCurve;
-  final ValueNotifier<int> pageIndexNotifier = ValueNotifier<int>(0);
+  ParametricCurve<double> _animationCurve = _modalBottomSheetCurve;
 
+  /// A [ValueNotifier] that holds the current index of the page being displayed
+  /// in the modal sheet. Used to trigger rebuilds when the page index changes.
+  final ValueNotifier<int> _pageIndexNotifier = ValueNotifier<int>(0);
+
+  /// The route that manages the modal sheet's configuration and navigation behavior.
+  late FamilyBottomSheetRoute _route;
+
+  /// A list that holds the pages (widgets) currently pushed onto the modal sheet.
   List<Widget> _pages = [];
 
+  /// A getter that returns the list of pages currently in the modal sheet stack.
   List<Widget> get pages => _pages;
 
-  Widget get currentPage => _pages[_currentPageIndex];
-
-  int get currentPageIndex => _currentPageIndex;
-
-  int get _currentPageIndex => pageIndexNotifier.value;
+  /// A private getter that returns the value of the page index stored in
+  /// [_pageIndexNotifier]. This value determines which page is currently displayed.
+  int get _currentPageIndex => _pageIndexNotifier.value;
 
   /// Setter to update the state of [widget.pageIndexNotifier]
   set _currentPageIndex(int value) {
-    pageIndexNotifier.value = value;
+    _pageIndexNotifier.value = value;
   }
 
+  /// The label for the route
   String _getRouteLabel(MaterialLocalizations localizations) {
     switch (Theme.of(context).platform) {
       case TargetPlatform.iOS:
@@ -166,12 +381,12 @@ class FamilyModalSheetState extends State<FamilyModalSheet> {
 
   void handleDragStart(DragStartDetails details) {
     // Allow the bottom sheet to track the user's finger accurately.
-    animationCurve = Curves.linear;
+    _animationCurve = Curves.linear;
   }
 
   void handleDragEnd(DragEndDetails details, {bool? isClosing}) {
     // Allow the bottom sheet to animate smoothly from its current position.
-    animationCurve = Split(
+    _animationCurve = Split(
       widget.route.animation!.value,
       endCurve: _modalBottomSheetCurve,
     );
@@ -181,6 +396,7 @@ class FamilyModalSheetState extends State<FamilyModalSheet> {
   void initState() {
     super.initState();
 
+    _route = widget.route;
     _pages = [widget.route.builder(context)];
   }
 
@@ -194,10 +410,10 @@ class FamilyModalSheetState extends State<FamilyModalSheet> {
     final String routeLabel = _getRouteLabel(localizations);
 
     return AnimatedBuilder(
-      animation: widget.route.animation!,
+      animation: _route.animation!,
       builder: (BuildContext context, Widget? child) {
-        final double animationValue = animationCurve.transform(
-          widget.route.animation!.value,
+        final double animationValue = _animationCurve.transform(
+          _route.animation!.value,
         );
 
         return Semantics(
@@ -208,7 +424,7 @@ class FamilyModalSheetState extends State<FamilyModalSheet> {
           child: ClipRect(
             child: _BottomSheetLayoutWithSizeListener(
               onChildSizeChanged: (Size size) {
-                widget.route.didChangeBarrierSemanticsClip(
+                _route.didChangeBarrierSemanticsClip(
                   _getNewClipDetails(size),
                 );
               },
@@ -222,21 +438,22 @@ class FamilyModalSheetState extends State<FamilyModalSheet> {
         );
       },
       child: ValueListenableBuilder(
-        valueListenable: pageIndexNotifier,
+        valueListenable: _pageIndexNotifier,
         builder: (context, currentPageIndex, _) {
           return SafeArea(
+            bottom: _route.useSafeArea,
             minimum: widget.safeAreaMinimum ?? EdgeInsets.zero,
             child: Padding(
               padding: EdgeInsets.only(
                 bottom: MediaQuery.viewInsetsOf(context).bottom,
               ),
               child: FamilyBottomSheet(
-                contentBackgroundColor: widget.route.contentBackgroundColor,
+                contentBackgroundColor: _route.contentBackgroundColor,
                 pageIndex: currentPageIndex,
-                animationController: widget.route.animationController,
+                animationController: _route.animationController,
                 pages: pages,
                 onClosing: () {
-                  if (widget.route.isCurrent) {
+                  if (_route.isCurrent) {
                     Navigator.pop(context);
                   }
                 },
@@ -249,6 +466,9 @@ class FamilyModalSheetState extends State<FamilyModalSheet> {
                 showDragHandle: widget.showDragHandle,
                 onDragStart: handleDragStart,
                 onDragEnd: handleDragEnd,
+                mainContentPadding: _route.mainContentPadding,
+                mainContentAnimationStyle: _route.mainContentAnimationStyle,
+                mainContentBorderRadius: _route.mainContentBorderRadius,
               ),
             ),
           );
@@ -257,14 +477,21 @@ class FamilyModalSheetState extends State<FamilyModalSheet> {
     );
   }
 
-  /// Add new page widget to [_pages] and update the [_currentPageIndex] to
-  /// trigger a rebuild in the ValueListenerNotifier
+  /// Adds a new page widget to the modal stack and updates the current page index
+  /// to trigger a rebuild in the [ValueNotifier]. This allows the modal sheet to
+  /// display new content by pushing the page onto the navigation stack.
   void pushPage(Widget page) {
     _pages = List<Widget>.of(_pages)..add(page);
     _currentPageIndex = _pages.length - 1;
   }
 
-  /// Callback to remove the top widget page from the custom modal stack
+  /// Removes the top widget page from the custom modal stack.
+  ///
+  /// If the stack has more than one page, the top page is removed and the current
+  /// page index is decremented to display the next page in the stack.
+  ///
+  /// If there is only one page left in the stack, it will pop the modal sheet,
+  /// effectively dismissing it.
   void popPage() {
     if (_pages.length > 1) {
       _pages = List<Widget>.of(_pages)..removeLast();
@@ -275,7 +502,7 @@ class FamilyModalSheetState extends State<FamilyModalSheet> {
   }
 }
 
-// Copied from the Flutter framework
+/// Copied from the Flutter framework
 class _BottomSheetLayoutWithSizeListener extends SingleChildRenderObjectWidget {
   const _BottomSheetLayoutWithSizeListener({
     required this.onChildSizeChanged,
@@ -322,12 +549,12 @@ class _RenderBottomSheetLayoutWithSizeListener extends RenderShiftedBox {
     required double animationValue,
     required bool isScrollControlled,
     required double scrollControlDisabledMaxHeightRatio,
-  }) : _onChildSizeChanged = onChildSizeChanged,
-       _animationValue = animationValue,
-       _isScrollControlled = isScrollControlled,
-       _scrollControlDisabledMaxHeightRatio =
-           scrollControlDisabledMaxHeightRatio,
-       super(child);
+  })  : _onChildSizeChanged = onChildSizeChanged,
+        _animationValue = animationValue,
+        _isScrollControlled = isScrollControlled,
+        _scrollControlDisabledMaxHeightRatio =
+            scrollControlDisabledMaxHeightRatio,
+        super(child);
 
   Size _lastSize = Size.zero;
 
@@ -407,10 +634,9 @@ class _RenderBottomSheetLayoutWithSizeListener extends RenderShiftedBox {
     if (result == null) {
       return null;
     }
-    final Size childSize =
-        childConstraints.isTight
-            ? childConstraints.smallest
-            : child.getDryLayout(childConstraints);
+    final Size childSize = childConstraints.isTight
+        ? childConstraints.smallest
+        : child.getDryLayout(childConstraints);
     return result + _getPositionForChild(constraints.biggest, childSize).dy;
   }
 
@@ -418,10 +644,9 @@ class _RenderBottomSheetLayoutWithSizeListener extends RenderShiftedBox {
     return BoxConstraints(
       minWidth: constraints.maxWidth,
       maxWidth: constraints.maxWidth,
-      maxHeight:
-          isScrollControlled
-              ? constraints.maxHeight
-              : constraints.maxHeight * scrollControlDisabledMaxHeightRatio,
+      maxHeight: isScrollControlled
+          ? constraints.maxHeight
+          : constraints.maxHeight * scrollControlDisabledMaxHeightRatio,
     );
   }
 
