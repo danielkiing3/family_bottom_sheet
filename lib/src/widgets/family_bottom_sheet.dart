@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:family_bottom_sheet/src/custom_bottom_sheet/widgets/modal_sheet_animated_switcher.dart';
+import 'package:family_bottom_sheet/src/widgets/modal_sheet_animated_switcher.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 

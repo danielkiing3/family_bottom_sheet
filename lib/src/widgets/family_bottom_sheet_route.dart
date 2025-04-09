@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'family_modal_sheet.dart';
+import '../family_modal_sheet.dart';
 import 'family_bottom_sheet.dart';
 
 final _defaultAnimationStyle = AnimationStyle(
