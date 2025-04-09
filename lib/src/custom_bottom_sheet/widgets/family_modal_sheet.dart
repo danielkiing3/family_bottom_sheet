@@ -7,6 +7,7 @@ import 'family_bottom_sheet_route.dart';
 const Curve _modalBottomSheetCurve = Easing.legacyDecelerate;
 const double _defaultScrollControlDisabledMaxHeightRatio = 1;
 
+/// A customizable modal bottom sheet that supports internal navigation
 class FamilyModalSheet<T> extends StatefulWidget {
   const FamilyModalSheet({
     super.key,
