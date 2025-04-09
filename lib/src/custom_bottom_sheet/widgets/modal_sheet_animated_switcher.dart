@@ -1,19 +1,10 @@
 import 'package:flutter/material.dart';
 
 AnimationStyle _defaultAnimationStyle = AnimationStyle(
-  curve: Curves.easeInOutQuad,
-  duration: Duration(milliseconds: 200),
-);
-
-const BorderRadius _defaultBorderRadius = BorderRadius.only(
-  topLeft: Radius.circular(36),
-  topRight: Radius.circular(36),
-  bottomLeft: Radius.circular(36),
-  bottomRight: Radius.circular(36),
-);
-
+    curve: Curves.easeInOutQuad, duration: Duration(milliseconds: 200));
+BorderRadius _defaultBorderRadius = BorderRadius.circular(36);
+const EdgeInsets _defaultContentPadding = EdgeInsets.symmetric(horizontal: 16);
 const Curve _defaultTransitionCurve = Curves.easeInOutQuad;
-
 const Duration _defaultTransitionDuration = Duration(milliseconds: 200);
 
 class FamilyModalSheetAnimatedSwitcher extends StatefulWidget {
@@ -22,11 +13,14 @@ class FamilyModalSheetAnimatedSwitcher extends StatefulWidget {
     required this.pageIndex,
     required this.pages,
     required this.contentBackgroundColor,
-    this.mainContentPadding = const EdgeInsets.symmetric(horizontal: 16),
-    AnimationStyle? animatedSwitcherAnimationStyle,
-    this.mainContentBorderRadius = _defaultBorderRadius,
-  })  : animatedSwitcherAnimationStyle =
-            animatedSwitcherAnimationStyle ?? _defaultAnimationStyle,
+    AnimationStyle? mainContentAnimationStyle,
+    EdgeInsets? mainContentPadding,
+    BorderRadius? mainContentBorderRadius,
+  })  : mainContentAnimationStyle =
+            mainContentAnimationStyle ?? _defaultAnimationStyle,
+        mainContentPadding = mainContentPadding ?? _defaultContentPadding,
+        mainContentBorderRadius =
+            mainContentBorderRadius ?? _defaultBorderRadius,
         assert(pageIndex >= 0 && pageIndex < pages.length && pages.isNotEmpty);
 
   /// The current index of the page to display
@@ -41,7 +35,7 @@ class FamilyModalSheetAnimatedSwitcher extends StatefulWidget {
   /// The padding of the main content
   ///
   /// Defaults to `EdgeInsets.symmetric(horizontal: 16)` if no value is passed
-  final EdgeInsets? mainContentPadding;
+  final EdgeInsets mainContentPadding;
 
   /// The border radius of the main content
   ///
@@ -49,7 +43,7 @@ class FamilyModalSheetAnimatedSwitcher extends StatefulWidget {
   final BorderRadius mainContentBorderRadius;
 
   /// The animation style of the animated switcher
-  final AnimationStyle animatedSwitcherAnimationStyle;
+  final AnimationStyle mainContentAnimationStyle;
 
   @override
   State<FamilyModalSheetAnimatedSwitcher> createState() =>
@@ -79,16 +73,16 @@ class _FamilyModalSheetAnimatedSwitcherState
 
     _animationController = AnimationController(
       vsync: this,
-      duration: widget.animatedSwitcherAnimationStyle.duration ??
+      duration: widget.mainContentAnimationStyle.duration ??
           _defaultTransitionDuration,
     );
 
     _heightAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: widget.animatedSwitcherAnimationStyle.curve ??
-            _defaultTransitionCurve,
-        reverseCurve: widget.animatedSwitcherAnimationStyle.reverseCurve,
+        curve:
+            widget.mainContentAnimationStyle.curve ?? _defaultTransitionCurve,
+        reverseCurve: widget.mainContentAnimationStyle.reverseCurve,
       ),
     );
 
@@ -107,7 +101,7 @@ class _FamilyModalSheetAnimatedSwitcherState
     }
 
     return Padding(
-      padding: widget.mainContentPadding ?? EdgeInsets.zero,
+      padding: widget.mainContentPadding,
       child: ClipRRect(
         borderRadius: widget.mainContentBorderRadius,
         child: Container(
