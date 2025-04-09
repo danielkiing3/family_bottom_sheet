@@ -14,7 +14,7 @@ class ChooseAreaContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FamilyBottomSheetShell(
-      text: 'Choose Area',
+      headerText: 'Choose Area',
       children: [
         _ChooseMenuItem(
           text: 'Send',

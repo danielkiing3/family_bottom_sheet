@@ -7,7 +7,7 @@ class ReportBugContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FamilyBottomSheetShell(
-      text: 'Report a bug',
+      headerText: 'Report a bug',
       children: [
         TextField(
           autofocus: true,

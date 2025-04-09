@@ -12,7 +12,7 @@ class HelpSupportContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FamilyBottomSheetShell(
-      text: 'How can we help?',
+      headerText: 'How can we help?',
       children: [
         _HelpSupportButton(
           icon: IconsaxPlusBold.building_4,

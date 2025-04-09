@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 class FamilyBottomSheetShell extends StatelessWidget {
   const FamilyBottomSheetShell({
     super.key,
-    required this.text,
+    required this.headerText,
     required this.children,
   });
 
-  final String text;
+  final String headerText;
   final List<Widget> children;
 
   @override
@@ -39,7 +39,7 @@ class FamilyBottomSheetShell extends StatelessWidget {
                       vertical: 3,
                     ),
                     child: Text(
-                      text,
+                    headerText,
                       style: context.textStyles.heading.copyWith(
                         color: colors.textDefault,
                       ),

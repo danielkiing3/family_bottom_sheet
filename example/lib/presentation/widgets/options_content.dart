@@ -11,7 +11,7 @@ class OptionsContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FamilyBottomSheetShell(
-      text: 'Options',
+      headerText: 'Options',
       children: [
         CustomTestButton(
           onTap: () {
