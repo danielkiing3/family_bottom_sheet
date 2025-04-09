@@ -4,6 +4,8 @@ import 'package:family_bottom_sheet/src/custom_bottom_sheet/widgets/modal_sheet_
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+const Duration _bottomSheetEnterDuration = Duration(milliseconds: 250);
+const Duration _bottomSheetExitDuration = Duration(milliseconds: 200);
 const double _minFlingVelocity = 700.0;
 const double _closeProgressThreshold = 0.5;
 
@@ -127,6 +129,19 @@ class FamilyBottomSheet extends StatefulWidget {
 
   /// The animation style of the animated switcher
   final AnimationStyle? mainContentAnimationStyle;
+
+  static AnimationController createAnimationController(
+    TickerProvider vsync, {
+    AnimationStyle? sheetAnimationStyle,
+  }) {
+    return AnimationController(
+      duration: sheetAnimationStyle?.duration ?? _bottomSheetEnterDuration,
+      reverseDuration:
+          sheetAnimationStyle?.reverseDuration ?? _bottomSheetExitDuration,
+      debugLabel: 'BottomSheet',
+      vsync: vsync,
+    );
+  }
 
   @override
   State<FamilyBottomSheet> createState() => _FamilyBottomSheetState();
