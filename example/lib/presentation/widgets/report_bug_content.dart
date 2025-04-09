@@ -10,7 +10,6 @@ class ReportBugContent extends StatelessWidget {
       headerText: 'Report a bug',
       children: [
         TextField(
-          autofocus: true,
           maxLines: 1,
           decoration: InputDecoration(hintText: 'Subject'),
         ),
