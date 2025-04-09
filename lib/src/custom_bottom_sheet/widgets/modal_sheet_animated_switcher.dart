@@ -1,16 +1,55 @@
 import 'package:flutter/material.dart';
 
+AnimationStyle _defaultAnimationStyle = AnimationStyle(
+  curve: Curves.easeInOutQuad,
+  duration: Duration(milliseconds: 200),
+);
+
+const BorderRadius _defaultBorderRadius = BorderRadius.only(
+  topLeft: Radius.circular(36),
+  topRight: Radius.circular(36),
+  bottomLeft: Radius.circular(36),
+  bottomRight: Radius.circular(36),
+);
+
+const Curve _defaultTransitionCurve = Curves.easeInOutQuad;
+
+const Duration _defaultTransitionDuration = Duration(milliseconds: 200);
+
 class FamilyModalSheetAnimatedSwitcher extends StatefulWidget {
-  const FamilyModalSheetAnimatedSwitcher({
+  FamilyModalSheetAnimatedSwitcher({
     super.key,
     required this.pageIndex,
     required this.pages,
     required this.contentBackgroundColor,
-  }) : assert(pageIndex >= 0 && pageIndex < pages.length);
+    this.mainContentPadding = const EdgeInsets.symmetric(horizontal: 16),
+    AnimationStyle? animatedSwitcherAnimationStyle,
+    this.mainContentBorderRadius = _defaultBorderRadius,
+  })  : animatedSwitcherAnimationStyle =
+            animatedSwitcherAnimationStyle ?? _defaultAnimationStyle,
+        assert(pageIndex >= 0 && pageIndex < pages.length && pages.isNotEmpty);
 
+  /// The current index of the page to display
   final int pageIndex;
+
+  /// The list of pages to be display
   final List<Widget> pages;
+
+  /// The background color of the modal sheet
   final Color contentBackgroundColor;
+
+  /// The padding of the main content
+  ///
+  /// Defaults to `EdgeInsets.symmetric(horizontal: 16)` if no value is passed
+  final EdgeInsets? mainContentPadding;
+
+  /// The border radius of the main content
+  ///
+  /// Defaults to placeholder value if no value is passed
+  final BorderRadius mainContentBorderRadius;
+
+  /// The animation style of the animated switcher
+  final AnimationStyle animatedSwitcherAnimationStyle;
 
   @override
   State<FamilyModalSheetAnimatedSwitcher> createState() =>
@@ -20,9 +59,11 @@ class FamilyModalSheetAnimatedSwitcher extends StatefulWidget {
 class _FamilyModalSheetAnimatedSwitcherState
     extends State<FamilyModalSheetAnimatedSwitcher>
     with SingleTickerProviderStateMixin {
+  /// The animation controller for the animated switcher
   late AnimationController _animationController;
+
+  /// The animation for the height of the animated switcher
   late Animation<double> _heightAnimation;
-  // late Animation<double> _testing1;
 
   Widget? _currentWidget;
   Widget? _previousWidget;
@@ -38,27 +79,20 @@ class _FamilyModalSheetAnimatedSwitcherState
 
     _animationController = AnimationController(
       vsync: this,
-      //TODO: Pass the animation duration from the route
-      duration: const Duration(milliseconds: 200),
+      duration: widget.animatedSwitcherAnimationStyle.duration ??
+          _defaultTransitionDuration,
     );
 
     _heightAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Curves.easeInOutQuad,
+        curve: widget.animatedSwitcherAnimationStyle.curve ??
+            _defaultTransitionCurve,
+        reverseCurve: widget.animatedSwitcherAnimationStyle.reverseCurve,
       ),
     );
 
-    // _testing1 = Tween<double>(begin: 0, end: 1).animate(
-    //   CurvedAnimation(
-    //     parent: _animationController,
-    //     curve: Interval(0, 0.8, curve: Curves.easeInOutQuad),
-    //   ),
-    // );
-
-    if (widget.pages.isNotEmpty && widget.pageIndex < widget.pages.length) {
-      _currentWidget = widget.pages[widget.pageIndex];
-    } else {}
+    _currentWidget = widget.pages[widget.pageIndex];
   }
 
   @override
@@ -73,20 +107,15 @@ class _FamilyModalSheetAnimatedSwitcherState
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: widget.mainContentPadding ?? EdgeInsets.zero,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(36),
+        borderRadius: widget.mainContentBorderRadius,
         child: Container(
-          decoration: ShapeDecoration(
-            color: widget.contentBackgroundColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(36),
-            ),
-          ),
+          color: widget.contentBackgroundColor,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // -- Current
+              // -- Current widget offstage
               Offstage(
                 child: SizedBox(key: _measureKey, child: _currentWidget),
               ),
@@ -94,16 +123,9 @@ class _FamilyModalSheetAnimatedSwitcherState
               AnimatedBuilder(
                 animation: _animationController,
                 builder: (context, child) {
-                  // Calculate interpolated height
-                  double displayHeight =
-                      _previousHeight +
+                  double displayHeight = _previousHeight +
                       (_currentHeight - _previousHeight) *
                           _heightAnimation.value;
-
-                  // Ensure we have a non-zero height
-                  if (displayHeight <= 0) {
-                    displayHeight = 100;
-                  }
 
                   return SizedBox(
                     height: displayHeight,
@@ -136,12 +158,7 @@ class _FamilyModalSheetAnimatedSwitcherState
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
-  void didUpdateWidget(covariant FamilyModalSheetAnimatedSwitcher oldWidget) {
+  void didUpdateWidget(FamilyModalSheetAnimatedSwitcher oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.pageIndex != widget.pageIndex ||
@@ -165,6 +182,10 @@ class _FamilyModalSheetAnimatedSwitcherState
     }
   }
 
+  /// Measures the current widget's height and updates initial values if needed.
+  ///
+  /// The method uses the [GlobalKey] to find the current context and
+  /// retrieves the height of the widget using the [RenderBox]
   void _measureCurrentWidget() {
     final BuildContext? context = _measureKey.currentContext;
 
