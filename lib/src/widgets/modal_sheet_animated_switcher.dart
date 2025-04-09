@@ -121,24 +121,27 @@ class _FamilyModalSheetAnimatedSwitcherState
                       (_currentHeight - _previousHeight) *
                           _heightAnimation.value;
 
-                  return SizedBox(
-                    height: displayHeight,
-                    child: SingleChildScrollView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      child: Stack(
-                        children: [
-                          if (_previousWidget != null &&
-                              _heightAnimation.value < 1.0)
-                            Opacity(
-                              opacity: 1.0 - _heightAnimation.value,
-                              child: SizedBox(child: _previousWidget),
-                            ),
-                          if (_currentWidget != null)
-                            Opacity(
-                              opacity: _heightAnimation.value,
-                              child: SizedBox(child: _currentWidget),
-                            ),
-                        ],
+                  return AbsorbPointer(
+                    absorbing: _animationController.isAnimating,
+                    child: SizedBox(
+                      height: displayHeight,
+                      child: SingleChildScrollView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        child: Stack(
+                          children: [
+                            if (_previousWidget != null &&
+                                _heightAnimation.value < 1.0)
+                              Opacity(
+                                opacity: 1.0 - _heightAnimation.value,
+                                child: SizedBox(child: _previousWidget),
+                              ),
+                            if (_currentWidget != null)
+                              Opacity(
+                                opacity: _heightAnimation.value,
+                                child: SizedBox(child: _currentWidget),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   );
