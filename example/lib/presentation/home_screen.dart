@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> openHelpSupportModal(BuildContext context) async {
-    await FamilyModalSheet.show<void>(
+    await FamilyModalSheet.showMaterialDefault<void>(
       context: context,
       contentBackgroundColor: context.colors.surface,
       builder: (ctx) {
