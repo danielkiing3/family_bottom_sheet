@@ -9,6 +9,10 @@ topics:
   - bottom-sheet
   - custom-modal
 
+screenshots:
+  - description: 'Example of family_bottom_sheet'
+    path: doc/family_modal_sheet.gif
+
 environment:
   sdk: ">=3.0.0 <4.0.0"
   flutter: ">=3.0.0"
