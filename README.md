@@ -33,16 +33,16 @@ Show a simple modal sheet:
 
 
 ```dart
-    await FamilyModalSheet.show<void>(
-      context: context,
-      contentBackgroundColor: Colors.white,
-      builder: (ctx) {
-        return const MyBottomSheetContent();
-      },
+await FamilyModalSheet.show<void>(
+    context: context,
+    contentBackgroundColor: Colors.white,
+    builder: (ctx) {
+    return const MyBottomSheetContent();
+    },
 
-       // Optional configurations
+    // Optional configurations
 
-    );
+);
 ```
 If you want something more similar to the look and feel of the Flutter bottom sheet, use the FamilyModalSheet.showMaterialDefault method. It comes with sensible defaults that resemble the standard Flutter modal bottom sheet, but still allows for full customization if needed.
 
@@ -50,12 +50,12 @@ If you want something more similar to the look and feel of the Flutter bottom sh
 ## Push a New Page
 
 ```dart
-    FamilyModalSheet.of(context).pushPage(AnotherCustomPage());
+FamilyModalSheet.of(context).pushPage(AnotherCustomPage());
 ```
 
 ## Pop the Current Page
 ```dart
-    FamilyModalSheet.of(context).popPage();
+FamilyModalSheet.of(context).popPage();
 ```
 
 Note: If it's the last page in the sheet stack, calling popPage() will automatically close the entire bottom sheet.
