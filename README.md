@@ -27,6 +27,12 @@ Install the library to your project by running:
 flutter pub add family_modal_sheet
 ```
 
+## Demo
+</br>
+</br>
+
+![Example app](https://github.com/danielkiing3/family_bottom_sheet/blob/main/doc/family_modal_sheet_demo.gif?raw=true)
+
 ## Usage
 Show a simple modal sheet:
 
@@ -71,7 +77,7 @@ This design gives you full control while following a clean, opinionated API simi
 - `contentBackgroundColor` - Background color for the content area
 - `mainContentBorderRadius` - Optional border radius to apply around the content area.
 - `mainContentPadding` - Optional padding applied inside the content area, wrapping all pages.
-- `safeAreaMinimum` - Minimum safe area padding (useful for handling insets on specific edges).
+- `safeAreaMinimum` - Minimum safe area padding (can also be used to add bottom padding to the bottom sheet).
 - `mainContentAnimationStyle` - Custom animation configuration for transitions between pages (push/pop).
 
 ## Bottom Sheet Container Customization (the outer modal appearance)
