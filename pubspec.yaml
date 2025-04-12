@@ -1,6 +1,6 @@
 name: family_bottom_sheet
 description: A package for building smooth, customizable multi-page bottom sheets with seamless transitions — just like a Navigator, but inside a bottom sheet.
-version: 0.0.1
+version: 0.0.2
 repository: https://github.com/danielkiing3/family_bottom_sheet
 
 topics:
@@ -11,7 +11,7 @@ topics:
 
 screenshots:
   - description: 'Example of family_bottom_sheet'
-    path: doc/family_modal_sheet.gif
+    path: doc/family_modal_sheet_demo.gif
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
