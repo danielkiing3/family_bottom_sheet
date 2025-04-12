@@ -30,7 +30,6 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
     super.barrierLabel,
     super.showDragHandle,
     super.settings,
-    super.requestFocus,
     super.transitionAnimationController,
     super.anchorPoint,
     super.useSafeArea = true,
