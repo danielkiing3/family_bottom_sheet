@@ -11,6 +11,7 @@ dependencies:
   iconsax_plus: ^1.0.0
   family_bottom_sheet:
     path: ../
+  unicode_emojis: ^0.4.0
 
 dev_dependencies:
   flutter_test:

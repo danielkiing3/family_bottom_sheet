@@ -1,7 +1,7 @@
 import 'package:family_bottom_sheet/family_bottom_sheet.dart';
 import 'package:family_bottom_sheet_example/common/button/custom_button.dart';
 import 'package:family_bottom_sheet_example/presentation/widgets/family_bottom_sheet_shell.dart';
-import 'package:family_bottom_sheet_example/presentation/widgets/private_key_content.dart';
+import 'package:family_bottom_sheet_example/presentation/widgets/options/private_key_content.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 

@@ -1,12 +1,13 @@
 import 'package:family_bottom_sheet/family_bottom_sheet.dart';
+import 'package:family_bottom_sheet_example/presentation/widgets/choose_emoji/choose_emoji_content.dart';
 import 'package:family_bottom_sheet_example/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'common/divider/small_divider.dart';
-import 'presentation/widgets/help_support_content.dart';
-import 'presentation/widgets/options_content.dart';
+import 'presentation/widgets/helps_support/help_support_content.dart';
+import 'presentation/widgets/options/options_content.dart';
 import 'presentation/widgets/settings_menu_item.dart';
 
 void main() {
@@ -95,6 +96,15 @@ class _HomeScreenState extends State<HomeScreen> {
               openHelpSupportModal(context);
             },
           ),
+          const SmallDivider(),
+          SettingsMenuItem(
+            title: 'Choose Emoji',
+            leadingIcon: IconsaxPlusLinear.emoji_happy,
+            trailingIcon: IconsaxPlusLinear.arrow_right_3,
+            onTap: () {
+              openChooseEmojiModal(context);
+            },
+          ),
         ],
       ),
     );
@@ -116,6 +126,18 @@ class _HomeScreenState extends State<HomeScreen> {
       contentBackgroundColor: context.colors.surface,
       builder: (ctx) {
         return const HelpSupportContent();
+      },
+    );
+  }
+
+  Future<void> openChooseEmojiModal(BuildContext context) async {
+    await FamilyModalSheet.show<void>(
+      context: context,
+      constraints: const BoxConstraints(maxHeight: 415),
+      safeAreaMinimum: const EdgeInsets.only(bottom: 16),
+      contentBackgroundColor: context.colors.surface,
+      builder: (ctx) {
+        return const ChooseEmojiContent();
       },
     );
   }
