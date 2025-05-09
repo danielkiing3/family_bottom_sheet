@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-const AnimationStyle _defaultAnimationStyle = AnimationStyle(
+AnimationStyle _defaultAnimationStyle = AnimationStyle(
     curve: Curves.easeInOutQuad, duration: Duration(milliseconds: 200));
 const BorderRadius _defaultBorderRadius = BorderRadius.all(Radius.circular(36));
 const EdgeInsets _defaultContentPadding = EdgeInsets.symmetric(horizontal: 16);
