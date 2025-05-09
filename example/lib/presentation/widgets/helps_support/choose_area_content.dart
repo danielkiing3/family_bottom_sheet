@@ -1,12 +1,11 @@
 import 'package:family_bottom_sheet/family_bottom_sheet.dart';
 import 'package:family_bottom_sheet_example/common/button/custom_button.dart';
 import 'package:family_bottom_sheet_example/common/button/on_tap_scaler.dart';
-import 'package:family_bottom_sheet_example/presentation/widgets/report_bug_content.dart';
+import 'package:family_bottom_sheet_example/presentation/widgets/family_bottom_sheet_shell.dart';
+import 'package:family_bottom_sheet_example/presentation/widgets/helps_support/report_bug_content.dart';
 import 'package:family_bottom_sheet_example/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
-
-import 'family_bottom_sheet_shell.dart';
 
 class ChooseAreaContent extends StatelessWidget {
   const ChooseAreaContent({super.key});
