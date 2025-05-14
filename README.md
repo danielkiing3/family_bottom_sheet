@@ -63,8 +63,21 @@ FamilyModalSheet.of(context).pushPage(AnotherCustomPage());
 ```dart
 FamilyModalSheet.of(context).popPage();
 ```
-
 Note: If it's the last page in the sheet stack, calling popPage() will automatically close the entire bottom sheet.
+
+
+## Check if you can pop
+```dart
+final bool canPop = FamilyModalSheet.of(context).canPopPage();
+```
+Use this to determine if calling `popPage()` will pop a page or dismiss the entire sheet
+
+## Get total page count
+```dart
+final int pageCount = FamilyModalSheet.of(context).getTotalPageCount();
+```
+Returns the number of pages currently in the stack
+
 
 
 # Customization

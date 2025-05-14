@@ -507,6 +507,13 @@ class FamilyModalSheetState extends State<FamilyModalSheet> {
       Navigator.of(context).pop();
     }
   }
+
+  /// Returns true if there is more than one page in the stack,
+  /// meaning popPage() will pop a page instead of dismissing the sheet.
+  bool canPopPage() => _pages.length > 1;
+
+  /// Returns the number of page in the navigaion stack
+  int getTotalPageCount() => _pages.length;
 }
 
 /// Copied from the Flutter framework
