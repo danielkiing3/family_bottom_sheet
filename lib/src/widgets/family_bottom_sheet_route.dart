@@ -16,6 +16,7 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
   FamilyBottomSheetRoute({
     required super.builder,
     required super.isScrollControlled,
+    required this.scrollControlDisabledMaxHeightRatioValue,
     required this.contentBackgroundColor,
     super.capturedThemes,
     super.barrierOnTapHint,
@@ -66,6 +67,8 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
   ///
   /// Defines how content transitions are animated.
   final AnimationStyle? mainContentAnimationStyle;
+
+  final double scrollControlDisabledMaxHeightRatioValue;
 
   final ValueNotifier<EdgeInsets> _clipInsetssNotifier =
       ValueNotifier<EdgeInsets>(EdgeInsets.zero);
@@ -121,6 +124,8 @@ class FamilyBottomSheetRoute<T> extends ModalBottomSheetRoute<T> {
         route: this,
         builder: builder,
         isScrollControlled: isScrollControlled,
+        scrollControlDisabledMaxHeightRatio:
+            scrollControlDisabledMaxHeightRatioValue,
         backgroundColor: backgroundColor ??
             sheetTheme.modalBackgroundColor ??
             sheetTheme.backgroundColor,

@@ -25,8 +25,7 @@ class FamilyModalSheet<T> extends StatefulWidget {
     this.clipBehavior,
     this.constraints,
     this.isScrollControlled = false,
-    this.scrollControlDisabledMaxHeightRatio =
-        _defaultScrollControlDisabledMaxHeightRatio,
+    required this.scrollControlDisabledMaxHeightRatio,
     this.enableDrag = true,
     this.showDragHandle = false,
     this.safeAreaMinimum,
@@ -145,6 +144,8 @@ class FamilyModalSheet<T> extends StatefulWidget {
   /// - `clipBehavior`: Clip behavior for the sheet.
   /// - `constraints`: Constraints for the sheet's size.
   /// - `isScrollControlled`: Whether the sheet can take up the full height of the screen.
+  /// - `scrollControlDisabledMaxHeightRatio`: When `isScrollControlled` is false,
+  /// this ratio determines the maximum height the sheet can occupy relative to the screen height. Defaults to `$_defaultScrollControlDisabledMaxHeightRatio`.
   /// - `useRootNavigator`: Whether to push the sheet using the root navigator.
   /// - `isDismissible`: Whether tapping outside dismisses the sheet.
   /// - `enableDrag`: Whether the sheet can be dismissed by dragging down.
@@ -183,6 +184,8 @@ class FamilyModalSheet<T> extends StatefulWidget {
     Color? barrierColor,
     BoxConstraints? constraints,
     bool isScrollControlled = false,
+    double scrollControlDisabledMaxHeightRatio =
+        _defaultScrollControlDisabledMaxHeightRatio,
     bool useRootNavigator = false,
     bool isDismissible = true,
     bool enableDrag = true,
@@ -207,6 +210,8 @@ class FamilyModalSheet<T> extends StatefulWidget {
       FamilyBottomSheetRoute<T>(
         builder: builder,
         isScrollControlled: isScrollControlled,
+        scrollControlDisabledMaxHeightRatioValue:
+            scrollControlDisabledMaxHeightRatio,
         contentBackgroundColor: contentBackgroundColor,
         capturedThemes: InheritedTheme.capture(
           from: context,
@@ -286,6 +291,8 @@ class FamilyModalSheet<T> extends StatefulWidget {
     Color? barrierColor,
     BoxConstraints? constraints,
     bool isScrollControlled = false,
+    double scrollControlDisabledMaxHeightRatio =
+        _defaultScrollControlDisabledMaxHeightRatio,
     bool useRootNavigator = false,
     bool isDismissible = true,
     bool enableDrag = true,
@@ -310,6 +317,8 @@ class FamilyModalSheet<T> extends StatefulWidget {
       FamilyBottomSheetRoute<T>(
         builder: builder,
         isScrollControlled: isScrollControlled,
+        scrollControlDisabledMaxHeightRatioValue:
+            scrollControlDisabledMaxHeightRatio,
         contentBackgroundColor: contentBackgroundColor,
         capturedThemes: InheritedTheme.capture(
           from: context,

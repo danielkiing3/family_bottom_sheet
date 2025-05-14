@@ -109,6 +109,7 @@ This design gives you full control while following a clean, opinionated API simi
 - `showDragHandle`- Optionally display a drag handle at the top of the sheet.
 - `isDismissible`- Whether tapping outside the sheet dismisses it.
 - `isScrollControlled`- Expand the sheet beyond its default max height (good for full-screen sheets).
+-  `scrollControlDisabledMaxHeightRatio`- When `isScrollControlled` is false, this ratio determines the maximum height the sheet can occupy relative to the screen height
 - `useSafeArea`- Whether to automatically apply safe area insets to the outer sheet.
 - `useRootNavigator`- Whether to push the sheet to the root navigator.
 - `routeSettings`- Optional route metadata.
