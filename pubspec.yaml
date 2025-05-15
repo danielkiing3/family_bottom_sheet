@@ -1,7 +1,8 @@
 name: family_bottom_sheet
 description: A package for building smooth, customizable multi-page bottom sheets with seamless transitions — just like a Navigator, but inside a bottom sheet.
-version: 0.0.2
+version: 0.1.0
 repository: https://github.com/danielkiing3/family_bottom_sheet
+issue_tracker: https://github.com/danielkiing3/family_bottom_sheet/issues
 
 topics:
   - ui

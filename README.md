@@ -63,8 +63,21 @@ FamilyModalSheet.of(context).pushPage(AnotherCustomPage());
 ```dart
 FamilyModalSheet.of(context).popPage();
 ```
-
 Note: If it's the last page in the sheet stack, calling popPage() will automatically close the entire bottom sheet.
+
+
+## Check if you can pop
+```dart
+final bool canPop = FamilyModalSheet.of(context).canPopPage();
+```
+Use this to determine if calling `popPage()` will pop a page or dismiss the entire sheet
+
+## Get total page count
+```dart
+final int pageCount = FamilyModalSheet.of(context).getTotalPageCount();
+```
+Returns the number of pages currently in the stack
+
 
 
 # Customization
@@ -96,6 +109,7 @@ This design gives you full control while following a clean, opinionated API simi
 - `showDragHandle`- Optionally display a drag handle at the top of the sheet.
 - `isDismissible`- Whether tapping outside the sheet dismisses it.
 - `isScrollControlled`- Expand the sheet beyond its default max height (good for full-screen sheets).
+-  `scrollControlDisabledMaxHeightRatio`- When `isScrollControlled` is false, this ratio determines the maximum height the sheet can occupy relative to the screen height
 - `useSafeArea`- Whether to automatically apply safe area insets to the outer sheet.
 - `useRootNavigator`- Whether to push the sheet to the root navigator.
 - `routeSettings`- Optional route metadata.
@@ -107,6 +121,9 @@ This design gives you full control while following a clean, opinionated API simi
 This package is inspired by the Family app's bottom sheet design system — where bottom sheets act as dynamic navigation surfaces for key user flows.
 
 This package is also inspired by work by the Wolt team on wolt_modal_sheet package
+
+# Contributors
+- [Aurélien Lepage](https://github.com/MrLepage)
 
 ## Contributing
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement". Don't forget to give the project a star! Thanks again!
