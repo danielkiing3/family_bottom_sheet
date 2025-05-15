@@ -48,9 +48,11 @@ class _ChooseEmojiContentState extends State<ChooseEmojiContent> {
                 final emoji = _filteredEmojis[index];
 
                 return OnTapScaler(
-                  onTap: () => FamilyModalSheet.of(context).pushPage(
-                    EmojiChoiceContent(emoji: emoji),
-                  ),
+                  onTap: () {
+                    FamilyModalSheet.of(context).pushPage(
+                      EmojiChoiceContent(emoji: emoji),
+                    );
+                  },
                   child: Center(
                     child: FittedBox(
                       fit: BoxFit.contain,

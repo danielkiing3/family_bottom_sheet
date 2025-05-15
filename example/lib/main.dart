@@ -130,10 +130,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  /// Example working with scrollable child
   Future<void> openChooseEmojiModal(BuildContext context) async {
     await FamilyModalSheet.show<void>(
       context: context,
       constraints: const BoxConstraints(maxHeight: 415),
+      // Use scrollControlDisabledMaxHeightRatio to control the content max height
       safeAreaMinimum: const EdgeInsets.only(bottom: 16),
       contentBackgroundColor: context.colors.surface,
       builder: (ctx) {
