@@ -122,6 +122,9 @@ This package is inspired by the Family app's bottom sheet design system — wher
 
 This package is also inspired by work by the Wolt team on wolt_modal_sheet package
 
+# Contributors
+- [Aurélien Lepage](https://github.com/MrLepage)
+
 ## Contributing
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement". Don't forget to give the project a star! Thanks again!
 
