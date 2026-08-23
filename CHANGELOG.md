@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Fix the first page being built in `initState`, which made any builder that
+  read an inherited widget (`Theme.of`, `Localizations.of`, `MediaQuery.of`)
+  throw `dependOnInheritedWidgetOfExactType() was called before
+  FamilyModalSheetState.initState() completed`. It is now built in
+  `didChangeDependencies`. [#17](https://github.com/danielkiing3/family_bottom_sheet/issues/17)
+
 ## 0.1.0
 - Expose new api for canPopPage and getTotalPageCount
 - Expose scrollControlDisabledMaxHeightRatio in show and showMaterialDefault method
