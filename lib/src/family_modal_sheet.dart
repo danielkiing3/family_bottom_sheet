@@ -413,7 +413,26 @@ class FamilyModalSheetState extends State<FamilyModalSheet> {
     super.initState();
 
     _route = widget.route;
-    _pages = [widget.route.builder(context)];
+  }
+
+  /// Builds the first page.
+  ///
+  /// This runs here rather than in [initState] because the builder is given a
+  /// [BuildContext] and is expected to be able to use it: `Theme.of`,
+  /// `Localizations.of` and `MediaQuery.of` all register an inherited
+  /// dependency, which is not allowed until [initState] has completed. Building
+  /// the page there threw for any such builder.
+  ///
+  /// [didChangeDependencies] also runs before the first [build], so [pages] is
+  /// never observed empty. The guard keeps the page built exactly once, as
+  /// before — the same lifetime a pushed page has.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_pages.isEmpty) {
+      _pages = [widget.route.builder(context)];
+    }
   }
 
   @override
