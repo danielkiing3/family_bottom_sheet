@@ -32,10 +32,39 @@ flutter pub add family_bottom_sheet:^1.0.0-dev.1
 The API may still change between dev versions. Feedback is welcome in [issues](https://github.com/danielkiing3/family_bottom_sheet/issues).
 
 ## Demo
-</br>
-</br>
 
-![Example app](https://github.com/danielkiing3/family_bottom_sheet/blob/main/doc/family_modal_sheet_demo.gif?raw=true)
+<table>
+  <tr>
+    <td align="center" valign="top">
+      <img src="https://raw.githubusercontent.com/danielkiing3/family_bottom_sheet/main/doc/demos/state-iphone.webp" width="260" alt="Pages keep their state"><br>
+      <sub>Pages keep their state</sub>
+    </td>
+    <td align="center" valign="top">
+      <img src="https://raw.githubusercontent.com/danielkiing3/family_bottom_sheet/main/doc/demos/flow-iphone.webp" width="260" alt="Push, replace, then start over"><br>
+      <sub>Push, replace, then start over</sub>
+    </td>
+    <td align="center" valign="top">
+      <img src="https://raw.githubusercontent.com/danielkiing3/family_bottom_sheet/main/doc/demos/result-iphone.webp" width="260" alt="Return a result"><br>
+      <sub>Return a result</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" valign="top">
+      <img src="https://raw.githubusercontent.com/danielkiing3/family_bottom_sheet/main/doc/demos/scroll-iphone.webp" width="260" alt="Lists and drag-to-close together"><br>
+      <sub>Lists and drag-to-close together</sub>
+    </td>
+    <td align="center" valign="top">
+      <img src="https://raw.githubusercontent.com/danielkiing3/family_bottom_sheet/main/doc/demos/look-iphone.webp" width="260" alt="Your own look, or the Material preset"><br>
+      <sub>Your own look, or the Material preset</sub>
+    </td>
+    <td></td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/danielkiing3/family_bottom_sheet/main/doc/demos/floating-ipad.webp" width="600" alt="Floating sheet on iPad"><br>
+  <sub>Floating on tablets, with a top or centre anchor</sub>
+</p>
 
 ## Usage
 

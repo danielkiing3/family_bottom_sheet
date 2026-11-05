@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 
 import 'common/divider/small_divider.dart';
+import 'demo_mode.dart';
 import 'presentation/widgets/helps_support/help_support_content.dart';
 import 'presentation/widgets/options/options_content.dart';
 import 'presentation/widgets/settings_menu_item.dart';
@@ -43,18 +44,22 @@ class MyApp extends StatelessWidget {
             builder: (context, themeMode, _) {
               return MaterialApp(
                 title: 'Family Tray Animation',
+                debugShowCheckedModeBanner: !kDemoMode,
                 themeMode: themeMode,
                 theme: AppTheme.lightTheme,
                 highContrastTheme: AppTheme.lightTheme,
                 darkTheme: AppTheme.darkTheme,
                 highContrastDarkTheme: AppTheme.darkTheme,
-                builder: (context, child) => FamilySheetTheme(
-                  data: const FamilySheetThemeData(
-                    presentation: FamilyPresentationStyle.adaptive(),
-                    surfaceBuilder: _familySurface,
-                  ),
-                  child: child!,
-                ),
+                builder: (context, child) {
+                  final app = FamilySheetTheme(
+                    data: const FamilySheetThemeData(
+                      presentation: FamilyPresentationStyle.adaptive(),
+                      surfaceBuilder: _familySurface,
+                    ),
+                    child: child!,
+                  );
+                  return kDemoMode ? DemoTouches(child: app) : app;
+                },
                 home: HomeScreen(),
               );
             },

@@ -11,8 +11,12 @@ topics:
   - custom-modal
 
 screenshots:
-  - description: 'Example of family_bottom_sheet'
-    path: doc/family_modal_sheet_demo.gif
+  - description: 'Pages keep their state while you move between them'
+    path: doc/screenshots/state-iphone.webp
+  - description: 'A flow that pushes, replaces and starts over in one sheet'
+    path: doc/screenshots/flow-iphone.webp
+  - description: 'A floating sheet on iPad'
+    path: doc/screenshots/floating-ipad.webp
 
 environment:
   sdk: ">=3.6.0 <4.0.0"
