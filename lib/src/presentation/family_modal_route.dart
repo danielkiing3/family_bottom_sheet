@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:scroll_drag_detector/scroll_drag_detector.dart';
@@ -8,15 +10,14 @@ import '../page_stack/family_page_transitions.dart';
 import 'family_presentation.dart';
 import 'family_presentation_style.dart';
 
-part 'dialog_chrome.dart';
 part 'sheet_chrome.dart';
 
 /// The modal route behind [FamilyModalSheet.show]: a [FamilyPageStack] shown
-/// as a bottom sheet or a centred dialog.
+/// as a sheet docked to the bottom edge or floating in the middle.
 ///
-/// With [FamilyPresentationStyle.adaptive] it picks sheet or dialog on every
-/// layout, so resizing the window or rotating the device switches it live.
-/// The pages move across untouched, so their state survives the switch.
+/// With [FamilyPresentationStyle.adaptive] or [FamilyPresentationStyle.resolve]
+/// it picks the placement on every layout, so resizing the window or rotating
+/// the device moves the sheet live, even mid-drag.
 ///
 /// Prefer [FamilyModalSheet.show]. Subclass this route to override
 /// [canUserDismiss].
@@ -39,7 +40,7 @@ class FamilyModalRoute<T> extends PopupRoute<T> {
   /// Builds the first page.
   final WidgetBuilder builder;
 
-  /// A sheet, a dialog, or adaptive.
+  /// A sheet, adaptive, or your own rule.
   final FamilyPresentationStyle presentation;
 
   /// Wraps the page stack in your surface. Defaults to [defaultFamilySurface].
@@ -74,32 +75,74 @@ class FamilyModalRoute<T> extends PopupRoute<T> {
   /// barrier updates. Closing from code with [Navigator.pop] still works.
   bool get canUserDismiss => true;
 
-  /// The presentation showing right now. With an adaptive [presentation] it
-  /// changes as the screen does.
-  FamilyFixedPresentationStyle get currentPresentation => _current;
-  late FamilyFixedPresentationStyle _current;
+  /// The presentation showing right now. With an adaptive or resolved
+  /// [presentation] it changes as the screen does.
+  FamilySheetStyle get currentPresentation => _current;
+  late FamilySheetStyle _current;
 
   double _popVelocity = 0;
 
   AnimationController? get _routeController => controller;
 
-  FamilyMotion get motion => switch (_current) {
-        FamilySheetStyle(:final motion) => motion,
-        FamilyDialogStyle(:final motion) => motion,
-      };
+  FamilyMotion get motion => _current.motion;
 
-  FamilyFixedPresentationStyle _resolve(double width) => switch (presentation) {
-        FamilyAdaptiveStyle(:final breakpoint, :final dialog, :final sheet) =>
-          width >= breakpoint ? dialog : sheet,
-        final FamilyFixedPresentationStyle style => style,
-      };
+  FamilySheetStyle _resolve(BuildContext context) =>
+      _resolveStyle(presentation, context);
+
+  // Turns any presentation into the one sheet to show right now. A resolve's
+  // rule can return adaptive or another resolve, so its answer is resolved
+  // again.
+  FamilySheetStyle _resolveStyle(
+    FamilyPresentationStyle style,
+    BuildContext context, {
+    int depth = 0,
+  }) {
+    if (depth > _maxResolveDepth) {
+      if (_hasReportedResolveLoop) return const FamilySheetStyle();
+      _hasReportedResolveLoop = true;
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: FlutterError.fromParts([
+            ErrorSummary(
+              'A FamilyPresentationStyle.resolve rule kept returning other '
+              'resolves.',
+            ),
+            ErrorDescription(
+              'It was resolved $_maxResolveDepth times without reaching a '
+              'sheet, so it most likely returns itself. A docked sheet is '
+              'shown instead.',
+            ),
+            ErrorHint(
+              'Make the rule return FamilyPresentationStyle.sheet or '
+              'FamilyPresentationStyle.adaptive.',
+            ),
+          ]),
+          library: 'family_bottom_sheet',
+        ),
+      );
+      return const FamilySheetStyle();
+    }
+    return switch (style) {
+      final FamilyAdaptiveStyle adaptive =>
+        adaptive.sheetFor(MediaQuery.maybeSizeOf(context)?.width ?? 0),
+      final FamilyResolvedStyle resolved => _resolveStyle(
+          resolved.resolve(context),
+          context,
+          depth: depth + 1,
+        ),
+      final FamilySheetStyle sheet => sheet,
+    };
+  }
+
+  // Far more nested resolves than any real rule needs.
+  static const int _maxResolveDepth = 16;
+  bool _hasReportedResolveLoop = false;
 
   @override
   void install() {
-    // Motion is read while the controller is created, so decide first.
-    _current = _resolve(
-      MediaQuery.maybeSizeOf(navigator!.context)?.width ?? 0,
-    );
+    // Motion is read while the controller is created, so decide first, from
+    // the navigator's context until the route has its own.
+    _current = _resolve(navigator!.context);
     super.install();
   }
 
@@ -108,6 +151,12 @@ class FamilyModalRoute<T> extends PopupRoute<T> {
 
   @override
   bool get barrierDismissible => isDismissible && canUserDismiss;
+
+  // Back must respect the guard even on a single page, where no page stack
+  // is in the way.
+  @override
+  RoutePopDisposition get popDisposition =>
+      canUserDismiss ? super.popDisposition : RoutePopDisposition.doNotPop;
 
   @override
   final String? barrierLabel;
@@ -162,8 +211,9 @@ class FamilyModalRoute<T> extends PopupRoute<T> {
   }
 }
 
-/// Shows the page stack in a sheet or a dialog, whichever the width calls for,
-/// moving the same stack across when that changes.
+/// Shows the page stack in the sheet the route resolves to. Docked and
+/// floating share this one wrapper, so a switch between them only moves the
+/// sheet.
 class _AdaptiveChrome<T> extends StatefulWidget {
   const _AdaptiveChrome({required this.route});
 
@@ -180,67 +230,40 @@ class _AdaptiveChromeState<T> extends State<_AdaptiveChrome<T>> {
 
   FamilyModalRoute<T> get _route => widget.route;
 
-  Widget _surface(Widget stack) {
-    return Builder(
-      builder: (context) =>
-          (_route.surfaceBuilder ?? defaultFamilySurface)(context, stack),
-    );
-  }
-
-  void _settleAfterSwitch() {
-    final controller = _route._routeController;
-    if (controller == null ||
-        controller.status == AnimationStatus.reverse ||
-        controller.value >= 1) {
-      return;
-    }
-    controller.animateWithMotion(_route.motion, target: 1);
-  }
-
   @override
   Widget build(BuildContext context) {
-    final style = _route._resolve(MediaQuery.sizeOf(context).width);
-    if (style.runtimeType != _route._current.runtimeType) {
-      // A drag may have been cut short by the switch, so make sure the route
-      // ends up fully open.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _settleAfterSwitch();
-      });
-    }
+    final style = _route._resolve(context);
     _route._current = style;
 
-    final isDialog = style is FamilyDialogStyle;
     final stack = FamilyPageStack(
       key: _stackKey,
       initialPage: _initialPage,
       transitionBuilder: _route.pageTransitionBuilder,
       motion: _route.pageMotion,
       canUserPop: () => _route.canUserDismiss,
-      alignment: switch (style) {
-        FamilySheetStyle() => Alignment.topCenter,
-        FamilyDialogStyle(:final anchor) => switch (anchor) {
-            FamilyDialogAnchor.top => Alignment.topCenter,
-            FamilyDialogAnchor.center => Alignment.center,
-            FamilyDialogAnchor.bottom => Alignment.bottomCenter,
+      alignment: switch (style.placement) {
+        FamilyDockedPlacement() => Alignment.topCenter,
+        FamilyFloatingPlacement(:final anchor) => switch (anchor) {
+            FamilyAnchor.top => Alignment.topCenter,
+            FamilyAnchor.center => Alignment.center,
+            FamilyAnchor.bottom => Alignment.bottomCenter,
           },
       },
     );
 
     return FamilyPresentationScope(
-      presentation:
-          isDialog ? FamilyPresentation.dialog : FamilyPresentation.sheet,
-      child: switch (style) {
-        FamilyDialogStyle() => _DialogChrome(
-            route: _route,
-            style: style,
-            child: _surface(stack),
-          ),
-        FamilySheetStyle() => _SheetChrome(
-            route: _route,
-            style: style,
-            child: _surface(stack),
-          ),
+      presentation: switch (style.placement) {
+        FamilyDockedPlacement() => FamilyPresentation.docked,
+        FamilyFloatingPlacement() => FamilyPresentation.floating,
       },
+      child: _SheetChrome(
+        route: _route,
+        style: style,
+        child: Builder(
+          builder: (context) =>
+              (_route.surfaceBuilder ?? defaultFamilySurface)(context, stack),
+        ),
+      ),
     );
   }
 }

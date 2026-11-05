@@ -7,8 +7,9 @@ const double _closeProgressThreshold = 0.5;
 const double _overdragExtent = 300.0;
 const double _overdragStiffness = 0.55;
 
-/// Slides the surface up from the bottom, and handles dragging it closed and
-/// the rubber band.
+/// Slides the surface up from the bottom to rest docked against the bottom edge
+/// or floating in the middle, and handles dragging it closed and the rubber
+/// band
 class _SheetChrome<T> extends StatefulWidget {
   const _SheetChrome({
     required this.route,
@@ -26,7 +27,11 @@ class _SheetChrome<T> extends StatefulWidget {
 
 class _SheetChromeState<T> extends State<_SheetChrome<T>>
     with SingleTickerProviderStateMixin {
-  final GlobalKey _sheetKey = GlobalKey(debugLabel: 'FamilySheet');
+  // The sheet's travel distance, set by the layout.
+  final _SheetMetrics _metrics = _SheetMetrics();
+
+  // Where a floating sheet's anchored edge sits.
+  final _AnchorMemory _anchorMemory = _AnchorMemory();
 
   /// How far, in pixels, the sheet is stretched past where it can go:
   /// positive above fully open, negative below it while it can't close.
@@ -41,8 +46,7 @@ class _SheetChromeState<T> extends State<_SheetChrome<T>>
 
   AnimationController get _controller => _route._routeController!;
 
-  double get _sheetHeight =>
-      (_sheetKey.currentContext!.findRenderObject()! as RenderBox).size.height;
+  double get _travel => _metrics.travel;
 
   bool get _dismissUnderway => _controller.status == AnimationStatus.reverse;
 
@@ -78,7 +82,7 @@ class _SheetChromeState<T> extends State<_SheetChrome<T>>
 
   void _handleDragUpdate(double delta) {
     if (_dismissUnderway) return;
-    final height = _sheetHeight;
+    final height = _travel;
     var up = -delta;
 
     // The sheet itself moves first, and whatever is left stretches it.
@@ -113,7 +117,7 @@ class _SheetChromeState<T> extends State<_SheetChrome<T>>
     }
 
     // In sheet progress per second, positive when opening.
-    final progressVelocity = -velocity / _sheetHeight;
+    final progressVelocity = -velocity / _travel;
 
     final isClosing = !willScroll &&
         (velocity > _minFlingVelocity ||
@@ -195,9 +199,44 @@ class _SheetChromeState<T> extends State<_SheetChrome<T>>
 
   @override
   Widget build(BuildContext context) {
-    final sheet = KeyedSubtree(key: _sheetKey, child: widget.child);
+    final style = widget.style;
+    final placement = style.placement;
+    final safe =
+        style.useSafeArea ? MediaQuery.paddingOf(context) : EdgeInsets.zero;
+    final keyboard = MediaQuery.viewInsetsOf(context).bottom;
 
-    final Widget layout = AnimatedBuilder(
+    // The area the sheet may rest in. A docked sheet keeps below the status
+    // bar and above the keyboard, and leaves the bottom inset to its surface.
+    // A floating sheet keeps its inset padding from every edge.
+    final area = switch (placement) {
+      FamilyDockedPlacement() =>
+        EdgeInsets.only(top: safe.top, bottom: keyboard),
+      FamilyFloatingPlacement(:final insetPadding) => insetPadding +
+          EdgeInsets.fromLTRB(
+            safe.left,
+            safe.top,
+            safe.right,
+            math.max(safe.bottom, keyboard),
+          ),
+    };
+    final floating = placement is FamilyFloatingPlacement;
+
+    // The sheet is moved clear of the system insets and the keyboard here, so
+    // its pages don't make room for them again.
+    final sheet = MediaQuery.removeViewInsets(
+      context: context,
+      removeBottom: true,
+      child: MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        removeLeft: floating,
+        removeRight: floating,
+        removeBottom: floating,
+        child: widget.child,
+      ),
+    );
+
+    return AnimatedBuilder(
       animation: Listenable.merge([_route.animation, _overdrag]),
       builder: (context, child) => Semantics(
         scopesRoute: true,
@@ -209,63 +248,85 @@ class _SheetChromeState<T> extends State<_SheetChrome<T>>
             delegate: _SheetLayoutDelegate(
               progress: _route.animation!.value,
               overdrag: _overdrag.value,
-              maxHeightFactor: widget.style.maxHeightFactor,
-              constraints: widget.style.constraints,
+              maxHeightFactor: style.maxHeightFactor,
+              placement: placement,
+              area: area,
+              anchorMemory: _anchorMemory,
+              metrics: _metrics,
             ),
             child: _withDragToDismiss(child!),
           ),
         ),
       ),
-      child: Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.viewInsetsOf(context).bottom,
-        ),
-        child: sheet,
-      ),
+      child: sheet,
     );
-
-    return widget.style.useSafeArea
-        ? SafeArea(bottom: false, child: layout)
-        : MediaQuery.removePadding(
-            context: context,
-            removeTop: true,
-            child: layout,
-          );
   }
 }
 
+class _SheetMetrics {
+  /// Pixels between fully closed and fully open.
+  double travel = 1;
+}
+
+/// Positions the sheet inside [area].
+///
+/// Across, the sheet is centred. Down, it rests against the bottom edge when
+/// docked, or where its anchor puts it when floating.
+///
+/// [progress] moves it from just below the screen (0) to that resting spot
+/// (1), and [overdrag] stretches it past.
 class _SheetLayoutDelegate extends SingleChildLayoutDelegate {
   const _SheetLayoutDelegate({
     required this.progress,
     required this.overdrag,
     required this.maxHeightFactor,
-    required this.constraints,
+    required this.placement,
+    required this.area,
+    required this.anchorMemory,
+    required this.metrics,
   });
 
   final double progress;
   final double overdrag;
   final double maxHeightFactor;
-  final BoxConstraints constraints;
+  final FamilySheetPlacement placement;
+  final EdgeInsets area;
+  final _AnchorMemory anchorMemory;
+  final _SheetMetrics metrics;
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints available) {
-    final width = constraints.constrainWidth(available.maxWidth);
+    final areaWidth = math.max(0.0, available.maxWidth - area.horizontal);
+    final areaHeight = math.max(0.0, available.maxHeight - area.vertical);
+    final width = math.min(areaWidth, placement.maxWidth);
     return BoxConstraints(
       minWidth: width,
       maxWidth: width,
-      minHeight: constraints.minHeight,
-      maxHeight: constraints.constrainHeight(
-        available.maxHeight * maxHeightFactor,
-      ),
+      maxHeight: areaHeight * maxHeightFactor,
     );
   }
 
   @override
   Offset getPositionForChild(Size size, Size childSize) {
-    return Offset(
-      (size.width - childSize.width) / 2,
-      size.height - childSize.height * progress - overdrag,
-    );
+    final areaSize = area.deflateSize(size);
+    final x = area.left + (areaSize.width - childSize.width) / 2;
+
+    final resting = switch (placement) {
+      FamilyDockedPlacement() => size.height - area.bottom - childSize.height,
+      FamilyFloatingPlacement(:final anchor) => area.top +
+          _anchoredOffset(
+            room: areaSize.height - childSize.height,
+            areaHeight: areaSize.height,
+            width: size.width,
+            anchor: anchor,
+            memory: anchorMemory,
+          ),
+    };
+
+    final closed = size.height;
+    metrics.travel = math.max(closed - resting, 1);
+    final y = closed + (resting - closed) * progress - overdrag;
+    return Offset(x, y);
   }
 
   @override
@@ -273,7 +334,8 @@ class _SheetLayoutDelegate extends SingleChildLayoutDelegate {
       progress != oldDelegate.progress ||
       overdrag != oldDelegate.overdrag ||
       maxHeightFactor != oldDelegate.maxHeightFactor ||
-      constraints != oldDelegate.constraints;
+      placement != oldDelegate.placement ||
+      area != oldDelegate.area;
 }
 
 class _VerticalDragDetector extends StatelessWidget {
@@ -310,4 +372,45 @@ class _VerticalDragDetector extends StatelessWidget {
       child: child,
     );
   }
+}
+
+/// Where an anchored edge sits, as a distance from its own side of the
+/// available area, and the screen width and area height it was decided for.
+/// Kept by a floating sheet so the edge stays put between pages.
+class _AnchorMemory {
+  double? width;
+  double? areaHeight;
+  double? gap;
+}
+
+/// How far down a box with [room] to spare sits, so the edge [anchor] names
+/// stays still between pages.
+double _anchoredOffset({
+  required double room,
+  required double areaHeight,
+  required double width,
+  required FamilyAnchor anchor,
+  required _AnchorMemory memory,
+}) {
+  final spare = math.max(room, 0.0);
+
+  // A new width (rotation, a resized window) starts over from the centre.
+  // A new height alone (the keyboard) keeps the anchor.
+  if (memory.width != width) {
+    memory
+      ..width = width
+      ..areaHeight = areaHeight
+      ..gap = spare / 2;
+  }
+
+  // Slide only as far as needed. A taller page keeps the slide; a shorter
+  // area, e.g. the keyboard, doesn't, so the sheet returns when it's gone.
+  final gap = (memory.gap ?? spare / 2).clamp(0.0, spare);
+  if (memory.areaHeight == areaHeight) memory.gap = gap;
+
+  return switch (anchor) {
+    FamilyAnchor.top => gap,
+    FamilyAnchor.center => spare / 2,
+    FamilyAnchor.bottom => spare - gap,
+  };
 }
