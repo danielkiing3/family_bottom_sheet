@@ -53,6 +53,25 @@ void main() {
     expect(_CounterPage.initCount['second'], 1);
   });
 
+  testWidgets('the first page builder can read inherited widgets', (
+    tester,
+  ) async {
+    await tester.pumpWidget(app(tester));
+    FamilyModalSheet.show<void>(
+      context: hostContext,
+      // Reading inherited widgets in the builder used to throw, because the
+      // first page was built in initState.
+      builder: (context) => Text(
+        '${MediaQuery.sizeOf(context).width} '
+        '${Localizations.localeOf(context).languageCode}',
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('400.0 en'), findsOneWidget);
+  });
+
   testWidgets('a page holding a GlobalKey mounts without a duplicate', (
     tester,
   ) async {

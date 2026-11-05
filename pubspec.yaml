@@ -1,6 +1,6 @@
 name: family_bottom_sheet
-description: A package for building smooth, customizable multi-page bottom sheets with seamless transitions — just like a Navigator, but inside a bottom sheet.
-version: 0.1.0
+description: Multi-page modal sheets and dialogs that keep each page's state and resize smoothly between pages. Fully custom look, adaptive for tablets.
+version: 1.0.0-dev.1
 repository: https://github.com/danielkiing3/family_bottom_sheet
 issue_tracker: https://github.com/danielkiing3/family_bottom_sheet/issues
 
@@ -15,17 +15,15 @@ screenshots:
     path: doc/family_modal_sheet_demo.gif
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.0.0"
+  sdk: ">=3.6.0 <4.0.0"
+  flutter: ">=3.32.0"
 
 dependencies:
   flutter:
     sdk: flutter
+  scroll_drag_detector: ^0.1.0+2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-
-flutter:
-  uses-material-design: true
