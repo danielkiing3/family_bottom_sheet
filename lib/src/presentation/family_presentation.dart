@@ -7,10 +7,14 @@ typedef FamilySurfaceBuilder = Widget Function(
   Widget child,
 );
 
-/// How the pages are being presented.
+/// How the pages are being presented right now, so a surface or a page can
+/// adapt
 enum FamilyPresentation {
-  sheet,
-  dialog;
+  /// A sheet against the bottom edge.
+  docked,
+
+  /// A sheet floating in the middle of the screen.
+  floating;
 
   /// The presentation around [context], or null outside a [FamilyModalSheet].
   static FamilyPresentation? maybeOf(BuildContext context) => context
@@ -32,20 +36,21 @@ class FamilyPresentationScope extends InheritedWidget {
       presentation != oldWidget.presentation;
 }
 
+const Color defaultFamilyBarrierColor = Color(0x8A000000);
+
 const Color _defaultSurfaceColor = Color(0xFFFFFFFF);
 const Radius _defaultSurfaceRadius = Radius.circular(24);
 
-/// The surface used when no [FamilySurfaceBuilder] is given.
 Widget defaultFamilySurface(BuildContext context, Widget child) {
   final presentation = FamilyPresentation.maybeOf(context);
-  final sheet = presentation != FamilyPresentation.dialog;
+  final docked = presentation != FamilyPresentation.floating;
   return ClipRRect(
-    borderRadius: sheet
+    borderRadius: docked
         ? const BorderRadius.vertical(top: _defaultSurfaceRadius)
         : const BorderRadius.all(_defaultSurfaceRadius),
     child: ColoredBox(
       color: _defaultSurfaceColor,
-      child: sheet
+      child: docked
           ? Padding(
               padding: EdgeInsets.only(
                 bottom: MediaQuery.paddingOf(context).bottom,
