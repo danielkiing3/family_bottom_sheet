@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter pub get
+        working-directory: example
+      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: flutter analyze
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.32.0 is the minimum in pubspec.yaml; keep them in sync.
+        flutter-version: ['3.32.0', 'stable']
+    name: test (${{ matrix.flutter-version }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter-version == 'stable' && '' || matrix.flutter-version }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter test
