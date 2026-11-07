@@ -9,12 +9,17 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
           cache: true
@@ -24,20 +29,41 @@ jobs:
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze
 
+  min-flutter:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.read.outputs.version }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - id: read
+        run: |
+          version=$(yq '.environment.flutter' pubspec.yaml | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          test -n "$version" || { echo "No environment.flutter minimum in pubspec.yaml"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
   test:
+    needs: min-flutter
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        # 3.32.0 is the minimum in pubspec.yaml; keep them in sync.
-        flutter-version: ['3.32.0', 'stable']
-    name: test (${{ matrix.flutter-version }})
+        include:
+          - name: minimum
+            flutter-version: ${{ needs.min-flutter.outputs.version }}
+          - name: stable
+            flutter-version: ''
+    name: test (${{ matrix.name }})
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
-          flutter-version: ${{ matrix.flutter-version == 'stable' && '' || matrix.flutter-version }}
+          persist-credentials: false
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: ${{ matrix.flutter-version }}
           channel: stable
           cache: true
+      - run: flutter --version
       - run: flutter pub get
       - run: flutter test
