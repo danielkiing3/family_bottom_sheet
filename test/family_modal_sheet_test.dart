@@ -361,6 +361,81 @@ void main() {
     expect(tester.getBottomLeft(find.byType(FamilyPageStack)).dy, 768);
   });
 
+  group('a finger held still on the sheet', () {
+    testWidgets('does not start a user gesture', (tester) async {
+      await tester.pumpWidget(app(tester));
+      FamilyModalSheet.show<void>(
+        context: hostContext,
+        builder: (_) => const SizedBox(height: 300, child: Text('content')),
+      );
+      await tester.pumpAndSettle();
+
+      final hold = await tester.startGesture(
+        tester.getCenter(find.text('content')),
+      );
+      await tester.pump();
+      expect(Navigator.of(hostContext).userGestureInProgress, isFalse);
+
+      await hold.up();
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('lets a second finger land on the sheet, not the barrier', (
+      tester,
+    ) async {
+      var secondDowns = 0;
+      await tester.pumpWidget(app(tester));
+      FamilyModalSheet.show<void>(
+        context: hostContext,
+        builder: (_) => SizedBox(
+          height: 300,
+          child: Column(
+            children: [
+              const Expanded(child: Text('held')),
+              Expanded(
+                child: Listener(
+                  behavior: HitTestBehavior.opaque,
+                  onPointerDown: (_) => secondDowns++,
+                  child: const Text('second'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final hold = await tester.startGesture(
+        tester.getCenter(find.text('held')),
+      );
+      await tester.pump();
+      await tester.tapAt(tester.getCenter(find.text('second')));
+      await tester.pumpAndSettle();
+
+      expect(secondDowns, 1);
+      expect(find.text('held'), findsOneWidget);
+
+      await hold.up();
+      await tester.pumpAndSettle();
+      expect(find.text('held'), findsOneWidget);
+    });
+
+    testWidgets('still closes the sheet when the finger then drags down', (
+      tester,
+    ) async {
+      await tester.pumpWidget(app(tester));
+      FamilyModalSheet.show<void>(
+        context: hostContext,
+        builder: (_) => const SizedBox(height: 300, child: Text('content')),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.fling(find.text('content'), const Offset(0, 300), 1500);
+      await tester.pumpAndSettle();
+      expect(find.text('content'), findsNothing);
+    });
+  });
+
   group('dragging from a list', () {
     Widget list(BuildContext _) => SizedBox(
           height: 400,

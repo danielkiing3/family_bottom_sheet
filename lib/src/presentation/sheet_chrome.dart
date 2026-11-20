@@ -73,15 +73,15 @@ class _SheetChromeState<T> extends State<_SheetChrome<T>>
     // Catch a stretch that's still springing back.
     _overdrag.stop();
     _rawOverdrag = _unRubberBand(_overdrag.value);
-
-    if (!_isUserGesture) {
-      _isUserGesture = true;
-      _route.navigator?.didStartUserGesture();
-    }
   }
 
   void _handleDragUpdate(double delta) {
     if (_dismissUnderway) return;
+
+    if (delta != 0 && !_isUserGesture) {
+      _isUserGesture = true;
+      _route.navigator?.didStartUserGesture();
+    }
     final height = _travel;
     var up = -delta;
 
@@ -108,8 +108,14 @@ class _SheetChromeState<T> extends State<_SheetChrome<T>>
   }
 
   void _handleDragEnd(double velocity, {bool willScroll = false}) {
+    final hasMoved = _isUserGesture;
     _stopUserGesture();
     if (_dismissUnderway) return;
+
+    if (!hasMoved) {
+      _settleOpen();
+      return;
+    }
 
     if (_rawOverdrag != 0 || !_canClose) {
       _settleOpen(stretchVelocity: -velocity);
