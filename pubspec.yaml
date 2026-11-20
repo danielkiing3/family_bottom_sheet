@@ -1,6 +1,6 @@
 name: family_bottom_sheet
 description: Multi-page modal sheets and dialogs that keep each page's state and resize smoothly between pages. Fully custom look, adaptive for tablets.
-version: 1.0.0-dev.1
+version: 1.0.0-dev.2
 repository: https://github.com/danielkiing3/family_bottom_sheet
 issue_tracker: https://github.com/danielkiing3/family_bottom_sheet/issues
 

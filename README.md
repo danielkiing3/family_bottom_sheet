@@ -26,7 +26,7 @@ flutter pub add family_bottom_sheet
 1.0 is in pre-release. To try it, ask for the dev version explicitly; a plain `pub add` stays on 0.1.0:
 
 ```bash
-flutter pub add family_bottom_sheet:^1.0.0-dev.1
+flutter pub add family_bottom_sheet:^1.0.0-dev.2
 ```
 
 The API may still change between dev versions. Feedback is welcome in [issues](https://github.com/danielkiing3/family_bottom_sheet/issues).
@@ -339,6 +339,7 @@ This package is also inspired by work by the Wolt team on wolt_modal_sheet packa
 
 # Contributors
 - [Aurélien Lepage](https://github.com/MrLepage)
+- [Noor Dawod](https://github.com/noordawod)
 
 ## Contributing
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement". Don't forget to give the project a star! Thanks again!

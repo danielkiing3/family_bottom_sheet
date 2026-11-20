@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-dev.2
+
+- Fixed a second tap closing the sheet while another finger was held on it. A touch with no movement started a user gesture on the route, so the route ignored the next pointer and it reached the barrier. A drag now only starts a user gesture once it moves the sheet.
+
 ## 1.0.0-dev.1
 
 A pre-release of 1.0.0, for testing before it's final. The API may still change between dev versions.
